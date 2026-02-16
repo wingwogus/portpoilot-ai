@@ -12,6 +12,7 @@ from models import (
     CheckupCreateRequest,
     CheckupFinding,
 )
+from etf_news_rag import ETFNewsRAGService
 
 # 포트폴리오 추천은 무조건 실연동(Ollama) 사용. Mock 응답 금지 정책.
 USE_MOCK_OLLAMA = os.getenv("USE_MOCK_OLLAMA", "false").lower() in ("1", "true", "yes", "on")
@@ -28,6 +29,9 @@ os.makedirs(REPORT_DIR, exist_ok=True)
 
 DAILY_BRIEFING_DATA: Dict[str, Any] = {}
 WEEKLY_CONTEXT_SUMMARY: str = ""
+
+ETF_NEWS_RAG = ETFNewsRAGService(data_path="data/sample_etf_news.json", cache_ttl_seconds=300)
+ETF_NEWS_INDEX_STATUS: Dict[str, Any] = {}
 
 # --- In-memory stores for Reason MVP prototype ---
 CHECKUPS: Dict[str, Dict[str, Any]] = {}
@@ -321,6 +325,12 @@ async def publish_daily_report():
 
     WEEKLY_CONTEXT_SUMMARY = load_weekly_reports_summary()
 
+    global ETF_NEWS_INDEX_STATUS
+    try:
+        ETF_NEWS_INDEX_STATUS = ETF_NEWS_RAG.build_index()
+    except Exception as e:
+        ETF_NEWS_INDEX_STATUS = {"error": str(e), "indexed_docs": 0}
+
 
 def get_briefing_data():
     return DAILY_BRIEFING_DATA
@@ -527,3 +537,20 @@ async def create_briefing(checkup_id: str, audience: str, tone: str) -> Optional
         "summary": summary,
         "bullets": bullets,
     }
+
+
+def search_etf_news(tickers: str, limit: int = 8, prefer_recent_hours: int = 96) -> Dict[str, Any]:
+    ticker_list = [t.strip().upper() for t in tickers.split(",") if t.strip()]
+    if not ticker_list:
+        raise ValueError("tickers 파라미터가 비어 있습니다. 예: QQQ,SCHD")
+
+    if not ETF_NEWS_RAG.docs:
+        # lazy build in case app started before data was ready
+        global ETF_NEWS_INDEX_STATUS
+        ETF_NEWS_INDEX_STATUS = ETF_NEWS_RAG.build_index()
+
+    return ETF_NEWS_RAG.search(
+        tickers=ticker_list,
+        limit=max(1, min(limit, 20)),
+        prefer_recent_hours=max(12, min(prefer_recent_hours, 24 * 14)),
+    )

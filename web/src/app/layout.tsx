@@ -26,10 +26,10 @@ export const metadata: Metadata = {
       "5문항 투자 성향 설문으로 맞춤 ETF 포트폴리오를 빠르게 확인하는 한국어 웹 서비스",
     type: "website",
     locale: "ko_KR",
-    url: "http://localhost:3000/survey",
+    url: "http://localhost:3000",
   },
   alternates: {
-    canonical: "/survey",
+    canonical: "/",
   },
 };
 

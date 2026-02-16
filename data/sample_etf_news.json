@@ -1,0 +1,74 @@
+[
+  {
+    "id": "n001",
+    "title": "Nvidia earnings beat drives AI rally across Nasdaq",
+    "content": "Nvidia posted another earnings beat with strong data center growth, helping QQQ-heavy mega caps rally. Analysts said cloud capex remains strong and semiconductor demand could expand into the second half.",
+    "url": "https://example.com/news/nvidia-earnings-ai-rally",
+    "published_at": "2026-02-16T06:30:00Z",
+    "tickers": ["QQQ", "SOXX"],
+    "sectors": ["Information Technology", "Semiconductors"]
+  },
+  {
+    "id": "n002",
+    "title": "US retail sales miss raises soft-landing questions",
+    "content": "US retail sales came in below expectations, triggering mixed performance in cyclical sectors. Dividend and quality names outperformed while growth multiples compressed briefly.",
+    "url": "https://example.com/news/us-retail-sales-miss",
+    "published_at": "2026-02-15T15:10:00Z",
+    "tickers": ["SCHD", "VTI"],
+    "sectors": ["Consumer Discretionary", "Consumer Staples"]
+  },
+  {
+    "id": "n003",
+    "title": "Fed officials signal rates likely unchanged near term",
+    "content": "Multiple Fed officials highlighted progress on inflation and suggested rates could stay unchanged in the near term. Treasury yields stayed stable and broad market ETFs traded flat.",
+    "url": "https://example.com/news/fed-rates-unchanged",
+    "published_at": "2026-02-16T01:20:00Z",
+    "tickers": ["QQQ", "SCHD", "SPY"],
+    "sectors": ["Financials", "Macro"]
+  },
+  {
+    "id": "n004",
+    "title": "Energy shares fall as crude drops below key level",
+    "content": "Oil prices fell after inventory data surprised to the upside, pressuring energy producers. Sector ETFs saw a broad drop and analysts cut short-term profit forecasts.",
+    "url": "https://example.com/news/energy-shares-fall",
+    "published_at": "2026-02-14T19:00:00Z",
+    "tickers": ["XLE", "SCHD"],
+    "sectors": ["Energy"]
+  },
+  {
+    "id": "n005",
+    "title": "Healthcare innovation names upgrade on strong pipeline",
+    "content": "Several large-cap healthcare companies received analyst upgrades after strong trial readouts. Defensive growth exposure attracted steady inflows from balanced ETF strategies.",
+    "url": "https://example.com/news/healthcare-upgrade-pipeline",
+    "published_at": "2026-02-13T22:45:00Z",
+    "tickers": ["XLV", "SCHD"],
+    "sectors": ["Health Care"]
+  },
+  {
+    "id": "n006",
+    "title": "Mega-cap tech faces valuation debate after sharp surge",
+    "content": "After a sharp rally, strategists debated stretched valuation in mega-cap tech. Some desks warned of short-term pullback risk despite solid medium-term earnings growth.",
+    "url": "https://example.com/news/megacap-tech-valuation-debate",
+    "published_at": "2026-02-12T12:05:00Z",
+    "tickers": ["QQQ"],
+    "sectors": ["Information Technology", "Communication Services"]
+  },
+  {
+    "id": "n007",
+    "title": "Dividend ETFs see inflows as volatility ticks higher",
+    "content": "With volatility rising, investors rotated into dividend ETFs for income stability. Fund flow data showed SCHD-related strategies attracting consistent allocations.",
+    "url": "https://example.com/news/dividend-etf-inflows",
+    "published_at": "2026-02-16T08:00:00Z",
+    "tickers": ["SCHD", "VYM"],
+    "sectors": ["Financials", "Utilities"]
+  },
+  {
+    "id": "n008",
+    "title": "Cloud software guidance mixed; market reaction contained",
+    "content": "Cloud software guidance was mixed this quarter. While some firms beat expectations, others cut outlooks. QQQ components ended mostly unchanged with dispersion under the surface.",
+    "url": "https://example.com/news/cloud-guidance-mixed",
+    "published_at": "2026-02-11T09:30:00Z",
+    "tickers": ["QQQ"],
+    "sectors": ["Information Technology"]
+  }
+]

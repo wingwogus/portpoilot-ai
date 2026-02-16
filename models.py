@@ -162,3 +162,24 @@ class BriefingResponse(BaseModel):
     headline: str
     summary: str
     bullets: List[str]
+
+
+# --- ETF 뉴스 RAG API 관련 ---
+class ETFNewsItem(BaseModel):
+    doc_id: str
+    title: str
+    source_link: str
+    published_at: str
+    summary: str
+    signal: Literal["bullish", "bearish", "neutral"]
+    evidence: List[str]
+    ticker_hits: List[str]
+    sector_tags: List[str]
+    score: float = Field(..., ge=0.0, le=1.0)
+
+
+class ETFNewsResponse(BaseModel):
+    query_tickers: List[str]
+    count: int = Field(..., ge=0)
+    cached: bool
+    items: List[ETFNewsItem]

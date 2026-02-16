@@ -1,7 +1,8 @@
-# PortPilot AI - FastAPI (ETF Recommendation Core)
+# PortPilot AI - FastAPI (ETF Recommendation + ETF 뉴스 RAG)
 
-사용자 성향 기반 ETF 추천 API(`/generate-portfolio`)를 핵심으로 정비한 백엔드입니다.
-기존 `/market-briefing`는 유지되며 부가 기능으로 동작합니다.
+사용자 성향 기반 ETF 추천 API(`/generate-portfolio`)와
+내장 VectorDB 기반 ETF 뉴스 RAG API(`/etf-news`)를 제공하는 백엔드입니다.
+기존 `/market-briefing`, `/api/v1/checkups`는 유지됩니다.
 
 ---
 
@@ -12,14 +13,16 @@
    - `seed_money`: 100,000 ~ 10,000,000,000
    - `risk_tolerance`: `보수적 | 중립 | 공격적` (별칭 `보수/중립형/공격` 허용)
    - `goal`: 2~200자
-2. 에러 메시지 개선
+2. 내장 VectorDB 기반 ETF 뉴스 RAG 1차 구현
+   - 뉴스 수집/정규화 파이프라인: `data/sample_etf_news.json` 로드 후 정규화
+   - 임베딩 저장: 해시 기반 임베딩(192-dim) 생성 후 메모리 VectorDB 인덱싱
+   - 메타태그 저장: `tickers`, `sectors` 태그와 함께 검색
+   - ETF별 검색 API 추가: `GET /etf-news?tickers=QQQ,SCHD`
+   - 응답 필드: `source_link`, `summary`, `signal`, `evidence`, `sector_tags`, `ticker_hits`
+   - 최근 뉴스 우선 로직: 시간 기반 recency boost + TTL 캐시(기본 5분)
+3. 에러 메시지 개선
    - FastAPI validation 에러를 `field/message` 구조로 반환
-3. Mock 응답 비활성화
-   - `/generate-portfolio`는 Ollama 실연동만 허용
-   - `USE_MOCK_OLLAMA=true`일 경우 명시적 에러 반환
-4. 응답에 `source` 필드 추가
-   - `ollama`
-5. CORS 유지
+4. CORS 유지
    - `http://localhost:3000`, `http://127.0.0.1:3000`
 
 ---
@@ -85,10 +88,41 @@ export USE_MOCK_OLLAMA=false
 }
 ```
 
-## 2) 부가 기능: `GET /market-briefing`
+## 2) ETF 뉴스 RAG: `GET /etf-news?tickers=QQQ,SCHD`
+
+쿼리 파라미터:
+- `tickers` (필수): 쉼표 구분 ETF 티커
+- `limit` (선택, 기본 8, 최대 20)
+- `prefer_recent_hours` (선택, 기본 96)
+
+응답 예시:
+
+```json
+{
+  "query_tickers": ["QQQ", "SCHD"],
+  "count": 5,
+  "cached": false,
+  "items": [
+    {
+      "doc_id": "n001",
+      "title": "Nvidia earnings beat drives AI rally across Nasdaq",
+      "source_link": "https://example.com/news/nvidia-earnings-ai-rally",
+      "published_at": "2026-02-16T06:30:00Z",
+      "summary": "Nvidia posted another earnings beat...",
+      "signal": "bullish",
+      "evidence": ["Nvidia posted another earnings beat..."],
+      "ticker_hits": ["QQQ"],
+      "sector_tags": ["Information Technology", "Semiconductors"],
+      "score": 0.7421
+    }
+  ]
+}
+```
+
+## 3) 부가 기능: `GET /market-briefing`
 - 기존 endpoint 유지
 
-## 3) Reason MVP: `/api/v1/*`
+## 4) Reason MVP: `/api/v1/*`
 - 기존 체크업 관련 endpoint 유지
 
 ---
@@ -121,7 +155,10 @@ curl -s -X POST 'http://localhost:8000/generate-portfolio' \
     "goal":"x"
   }'
 
-# 3) 레거시/부가 기능 유지 확인
+# 3) ETF 뉴스 RAG 검색
+curl -s 'http://localhost:8000/etf-news?tickers=QQQ,SCHD&limit=5'
+
+# 4) 레거시/부가 기능 유지 확인
 curl -s 'http://localhost:8000/market-briefing'
 ```
 
@@ -138,7 +175,8 @@ bash scripts/self-test.sh
 
 검증 항목:
 1. CORS preflight
-2. `/generate-portfolio` 기본 요청 성공
-3. 응답 `source` 필드(`mock|ollama`) 존재
-4. `/market-briefing` 동작
-5. `/api/v1` 기존 checkup 흐름 호환
+2. `/api/v1` checkup 생성/완료/조회/recompose/briefing
+3. `/etf-news?tickers=QQQ,SCHD` 실제 검색 흐름 동작
+4. ETF 뉴스 응답에 `source_link/summary/signal/evidence` 포함
+5. `/generate-portfolio` 기본 요청 검증 (`source` 확인 또는 Ollama 미연결 503 확인)
+6. `/market-briefing` 동작

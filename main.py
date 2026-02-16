@@ -16,6 +16,7 @@ from models import (
     RecomposeRequest,
     BriefingRequest,
     BriefingResponse,
+    ETFNewsResponse,
 )
 from services import (
     publish_daily_report,
@@ -26,6 +27,7 @@ from services import (
     get_checkup,
     recompose_checkup,
     create_briefing,
+    search_etf_news,
 )
 
 
@@ -130,3 +132,13 @@ async def post_checkup_briefings(checkup_id: str, request: BriefingRequest):
     if not briefing:
         raise HTTPException(status_code=404, detail="completed checkup not found")
     return briefing
+
+
+@app.get("/etf-news", response_model=ETFNewsResponse, tags=["etf-news"])
+async def get_etf_news(tickers: str, limit: int = 8, prefer_recent_hours: int = 96):
+    try:
+        return search_etf_news(tickers=tickers, limit=limit, prefer_recent_hours=prefer_recent_hours)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"ETF 뉴스 검색 실패: {e}")
