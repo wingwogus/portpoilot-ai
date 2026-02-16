@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { MobileShell } from "@/components/mobile-shell";
 import { Card } from "@/components/ui";
 import { mockReasonApi } from "@/lib/api/mock-client";
@@ -15,19 +15,46 @@ function riskLabel(risk: ReasonResult["risk"]) {
 }
 
 function ResultContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const jobId = searchParams.get("jobId") ?? "demo";
   const [result, setResult] = useState<ReasonResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
-    mockReasonApi.getResult(jobId).then((data) => {
-      if (mounted) setResult(data);
-    });
+    setError(null);
+
+    mockReasonApi
+      .getResult(jobId)
+      .then((data) => {
+        if (mounted) setResult(data);
+      })
+      .catch(() => {
+        if (mounted) setError("결과를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.");
+      });
+
     return () => {
       mounted = false;
     };
   }, [jobId]);
+
+  if (error) {
+    return (
+      <MobileShell title="진단 결과" subtitle="결과를 확인하는 중 문제가 발생했습니다.">
+        <Card>
+          <p className="text-sm text-rose-600">{error}</p>
+          <button
+            type="button"
+            onClick={() => router.push(`/processing?jobId=${jobId}`)}
+            className="mt-3 rounded-xl bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+          >
+            다시 시도하기
+          </button>
+        </Card>
+      </MobileShell>
+    );
+  }
 
   if (!result) {
     return <MobileShell title="진단 결과" subtitle="결과를 불러오는 중입니다..." />;

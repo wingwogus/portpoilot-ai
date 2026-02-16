@@ -22,7 +22,6 @@ export default function CheckupPage() {
     setLoading(true);
     const payload = { goal: goal.trim(), concern: concern.trim(), horizonWeeks };
     const { jobId } = await mockReasonApi.submitCheckup(payload);
-    window.localStorage.setItem(`checkup:${jobId}`, JSON.stringify(payload));
     router.push(`/processing?jobId=${jobId}`);
   };
 

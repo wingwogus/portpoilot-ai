@@ -1,4 +1,4 @@
-import type { ReasonApi } from "@/lib/api/contracts";
+import type { JobStatus, ReasonApi } from "@/lib/api/contracts";
 import type {
   BriefingResult,
   CheckupInput,
@@ -8,6 +8,13 @@ import type {
 } from "@/lib/types";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const JOB_META_KEY = "checkup:meta:";
+
+type JobMeta = {
+  readyAt: number;
+  status: JobStatus;
+};
 
 const makeResult = (input: CheckupInput): ReasonResult => ({
   score: Math.min(95, 60 + (input.goal.length % 30)),
@@ -29,17 +36,65 @@ const makeBriefing = (result: ReasonResult): BriefingResult => ({
   caveat: "현재는 MVP 더미 결과입니다. 이후 실제 모델 응답으로 교체됩니다.",
 });
 
+const saveJobMeta = (jobId: string, payload: CheckupInput) => {
+  if (typeof window === "undefined") return;
+
+  const now = Date.now();
+  // 입력 길이에 따라 0.5~1.4초 사이로 준비 시간 부여 (고정 대기 제거)
+  const variableDelay = 500 + ((payload.goal.length + payload.concern.length) % 900);
+  const delay = payload.concern.includes("지연") ? 12000 : variableDelay;
+  const readyAt = now + delay;
+  const status: JobStatus = payload.concern.includes("실패") ? "failed" : "processing";
+
+  window.localStorage.setItem(`checkup:${jobId}`, JSON.stringify(payload));
+  window.localStorage.setItem(`${JOB_META_KEY}${jobId}`, JSON.stringify({ readyAt, status } satisfies JobMeta));
+};
+
+const getJobMeta = (jobId: string): JobMeta | null => {
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem(`${JOB_META_KEY}${jobId}`);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw) as JobMeta;
+  } catch {
+    return null;
+  }
+};
+
 export const mockReasonApi: ReasonApi = {
-  async submitCheckup(): Promise<{ jobId: string }> {
-    await wait(700);
-    return { jobId: crypto.randomUUID() };
+  async submitCheckup(input: CheckupInput): Promise<{ jobId: string }> {
+    await wait(250);
+    const jobId = crypto.randomUUID();
+    saveJobMeta(jobId, input);
+    return { jobId };
+  },
+
+  async getJobStatus(jobId: string): Promise<{ status: JobStatus }> {
+    await wait(120);
+
+    const meta = getJobMeta(jobId);
+    if (!meta) {
+      return { status: "failed" };
+    }
+
+    if (meta.status === "failed") {
+      return { status: "failed" };
+    }
+
+    return { status: Date.now() >= meta.readyAt ? "completed" : "processing" };
   },
 
   async getResult(jobId: string): Promise<ReasonResult> {
-    await wait(900);
+    await wait(180);
 
     if (typeof window === "undefined") {
       return makeResult({ goal: "MVP 출시", concern: "불확실한 리스크", horizonWeeks: 4 });
+    }
+
+    const status = await this.getJobStatus(jobId);
+    if (status.status === "failed") {
+      throw new Error("결과 생성에 실패했습니다.");
     }
 
     const raw = window.localStorage.getItem(`checkup:${jobId}`);
