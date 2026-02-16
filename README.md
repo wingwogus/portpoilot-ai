@@ -13,10 +13,21 @@ Lightweight FastAPI backend prototype with:
 
 ## Run
 
+### Backend only
 ```bash
 cd /home/node/.openclaw/workspace/portpoilot-ai
-uvicorn main:app --reload --port 8000
+python3 -m uvicorn main:app --reload --port 8000
 ```
+
+### Frontend + Backend together (recommended)
+```bash
+cd /home/node/.openclaw/workspace/portpoilot-ai
+./dev-up.sh
+```
+
+Open:
+- Frontend: `http://localhost:3000`
+- API docs: `http://localhost:8000/docs`
 
 Open API docs:
 
