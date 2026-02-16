@@ -109,7 +109,12 @@ def _deterministic_score(seed_text: str, offset: int, low: int = 55, high: int =
     return low + (number % (high - low + 1))
 
 
-def _build_checkup_result(checkup_id: str, request_data: Dict[str, Any], recomposed_version: int = 1) -> Dict[str, Any]:
+def _build_checkup_result(
+    checkup_id: str,
+    request_data: Dict[str, Any],
+    recomposed_version: int = 1,
+    job_id: Optional[str] = None,
+) -> Dict[str, Any]:
     base_seed = f"{checkup_id}|{request_data.get('product_name')}|{request_data.get('target_user')}|{request_data.get('goal')}|v{recomposed_version}"
 
     findings = [
@@ -169,9 +174,18 @@ def _build_checkup_result(checkup_id: str, request_data: Dict[str, Any], recompo
         "최근 고객 성과 사례 2건을 상단 섹션에 추가",
     ]
 
+    summary_result = {
+        "overall_score": overall,
+        "verdict": verdict,
+        "top_areas": [item.area for item in findings[:3]],
+        "next_actions": next_actions,
+    }
+
     return {
         "checkup_id": checkup_id,
+        "job_id": job_id,
         "status": "COMPLETED",
+        "result": summary_result,
         "created_at": _now_iso(),
         "updated_at": _now_iso(),
         "request": request_data,
@@ -347,7 +361,12 @@ async def _run_checkup_job(job_id: str, checkup_id: str):
 
         request_data = checkup_record["request"]
         recomposed_version = checkup_record.get("recomposed_version", 1)
-        result = _build_checkup_result(checkup_id, request_data, recomposed_version=recomposed_version)
+        result = _build_checkup_result(
+            checkup_id,
+            request_data,
+            recomposed_version=recomposed_version,
+            job_id=job_id,
+        )
 
         # keep initial created_at for consistency
         result["created_at"] = checkup_record["created_at"]
@@ -371,7 +390,9 @@ async def create_checkup(request: CheckupCreateRequest) -> Dict[str, Any]:
 
         CHECKUPS[checkup_id] = {
             "checkup_id": checkup_id,
+            "job_id": job_id,
             "status": "PENDING",
+            "result": None,
             "created_at": now,
             "updated_at": now,
             "request": _to_dict(request),
@@ -393,7 +414,7 @@ async def create_checkup(request: CheckupCreateRequest) -> Dict[str, Any]:
 
     asyncio.create_task(_run_checkup_job(job_id, checkup_id))
 
-    return {"checkup_id": checkup_id, "job_id": job_id, "status": "PENDING"}
+    return {"checkup_id": checkup_id, "job_id": job_id, "status": "PENDING", "result": None}
 
 
 async def get_job(job_id: str) -> Optional[Dict[str, Any]]:
@@ -421,7 +442,12 @@ async def recompose_checkup(checkup_id: str, focus: Optional[str]) -> Optional[D
             base_request = dict(base_request)
             base_request["goal"] = f"{base_request.get('goal', '')} | focus:{focus}"
 
-        recomposed = _build_checkup_result(checkup_id, base_request, recomposed_version=next_version)
+        recomposed = _build_checkup_result(
+            checkup_id,
+            base_request,
+            recomposed_version=next_version,
+            job_id=row.get("job_id"),
+        )
         recomposed["created_at"] = row["created_at"]
         recomposed["updated_at"] = _now_iso()
 
@@ -463,8 +489,22 @@ async def create_briefing(checkup_id: str, audience: str, tone: str) -> Optional
             "카피/신뢰요소/CTA 개선 시 단기 전환 개선 여지 큼",
         ]
 
+    briefing_payload = {
+        "audience": audience,
+        "tone": tone,
+        "headline": headline,
+        "summary": summary,
+        "bullets": bullets,
+        "score": score,
+        "verdict": verdict,
+        "top_issues": top_issues,
+    }
+
     return {
         "checkup_id": checkup_id,
+        "job_id": row.get("job_id"),
+        "status": row.get("status", "UNKNOWN"),
+        "result": briefing_payload,
         "audience": audience,
         "tone": tone,
         "headline": headline,

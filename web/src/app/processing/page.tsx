@@ -13,6 +13,7 @@ function ProcessingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const jobId = searchParams.get("jobId");
+  const checkupId = searchParams.get("checkupId");
   const [viewState, setViewState] = useState<ViewState>("processing");
   const [checking, setChecking] = useState(false);
 
@@ -21,10 +22,11 @@ function ProcessingContent() {
 
     setChecking(true);
     try {
-      const { status } = await mockReasonApi.getJobStatus(jobId);
+      const { status, checkupId: resolvedCheckupId } = await mockReasonApi.getJobStatus(jobId);
 
       if (status === "completed") {
-        router.replace(`/result?jobId=${jobId}`);
+        const targetCheckupId = resolvedCheckupId ?? checkupId;
+        router.replace(targetCheckupId ? `/result?jobId=${jobId}&checkupId=${targetCheckupId}` : `/result?jobId=${jobId}`);
         return;
       }
 
@@ -47,11 +49,12 @@ function ProcessingContent() {
     let disposed = false;
 
     const run = async () => {
-      const { status } = await mockReasonApi.getJobStatus(jobId);
+      const { status, checkupId: resolvedCheckupId } = await mockReasonApi.getJobStatus(jobId);
       if (disposed) return;
 
       if (status === "completed") {
-        router.replace(`/result?jobId=${jobId}`);
+        const targetCheckupId = resolvedCheckupId ?? checkupId;
+        router.replace(targetCheckupId ? `/result?jobId=${jobId}&checkupId=${targetCheckupId}` : `/result?jobId=${jobId}`);
         return;
       }
 
@@ -67,7 +70,8 @@ function ProcessingContent() {
 
           if (next.status === "completed") {
             window.clearInterval(interval);
-            router.replace(`/result?jobId=${jobId}`);
+            const targetCheckupId = next.checkupId ?? checkupId;
+            router.replace(targetCheckupId ? `/result?jobId=${jobId}&checkupId=${targetCheckupId}` : `/result?jobId=${jobId}`);
             return;
           }
 
@@ -105,7 +109,7 @@ function ProcessingContent() {
       disposed = true;
       if (cleanup) cleanup();
     };
-  }, [jobId, router]);
+  }, [jobId, checkupId, router]);
 
   return (
     <MobileShell title="분석 진행 중" subtitle="입력값을 분석해 점수/강점/리스크를 계산하고 있습니다.">

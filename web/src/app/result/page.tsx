@@ -18,6 +18,7 @@ function ResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const jobId = searchParams.get("jobId") ?? "demo";
+  const checkupId = searchParams.get("checkupId");
   const [result, setResult] = useState<ReasonResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,11 +98,14 @@ function ResultContent() {
       <nav aria-label="다음 작업" className="grid grid-cols-1 gap-3 md:grid-cols-2">
         <Link
           className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-center text-sm font-medium"
-          href={`/recompose?jobId=${jobId}`}
+          href={checkupId ? `/recompose?jobId=${jobId}&checkupId=${checkupId}` : `/recompose?jobId=${jobId}`}
         >
           재구성 제안 보기
         </Link>
-        <Link className="rounded-xl bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white" href={`/briefing?jobId=${jobId}`}>
+        <Link
+          className="rounded-xl bg-indigo-600 px-4 py-2 text-center text-sm font-medium text-white"
+          href={checkupId ? `/briefing?jobId=${jobId}&checkupId=${checkupId}` : `/briefing?jobId=${jobId}`}
+        >
           브리핑 생성
         </Link>
       </nav>

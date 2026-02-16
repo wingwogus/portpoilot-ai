@@ -1,12 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { MobileShell } from "@/components/mobile-shell";
 import { Card, Label } from "@/components/ui";
 import { mockReasonApi } from "@/lib/api/mock-client";
 import type { RecomposeResult } from "@/lib/types";
 
-export default function RecomposePage() {
+function RecomposeContent() {
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get("jobId") ?? undefined;
+  const checkupId = searchParams.get("checkupId") ?? undefined;
   const [tone, setTone] = useState<"balanced" | "optimistic" | "conservative">("balanced");
   const [focus, setFocus] = useState("전환율 개선");
   const [result, setResult] = useState<RecomposeResult | null>(null);
@@ -15,7 +19,7 @@ export default function RecomposePage() {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setLoading(true);
-    const data = await mockReasonApi.recompose({ tone, focus });
+    const data = await mockReasonApi.recompose({ tone, focus, jobId, checkupId });
     setResult(data);
     setLoading(false);
   };
@@ -60,5 +64,13 @@ export default function RecomposePage() {
         </Card>
       ) : null}
     </MobileShell>
+  );
+}
+
+export default function RecomposePage() {
+  return (
+    <Suspense fallback={<MobileShell title="재구성 제안" subtitle="재구성 준비 중..." />}>
+      <RecomposeContent />
+    </Suspense>
   );
 }

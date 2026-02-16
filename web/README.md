@@ -5,7 +5,7 @@ Fast mobile-first prototype for the Reason flow.
 ## Stack
 - Next.js 16 (App Router, TypeScript)
 - Tailwind CSS 4
-- Mocked API client contracts (no backend dependency)
+- FastAPI 연동 API client (`NEXT_PUBLIC_API_BASE_URL` 기반)
 
 ## Routes
 - `/checkup` — capture objective + concern input
@@ -18,22 +18,34 @@ Fast mobile-first prototype for the Reason flow.
 - `src/app/*` route pages
 - `src/components/*` reusable mobile shell + UI primitives
 - `src/lib/api/contracts.ts` API contract interfaces
-- `src/lib/api/mock-client.ts` mocked API implementation
+- `src/lib/api/mock-client.ts` FastAPI client + snake_case→camelCase adapter
 - `src/lib/types.ts` shared domain types
 
 ## Run Locally
 ```bash
-cd web
+# terminal 1 (backend)
+cd /home/node/.openclaw/workspace/portpoilot-ai
+python3 -m uvicorn main:app --reload --port 8000
+
+# terminal 2 (frontend)
+cd /home/node/.openclaw/workspace/portpoilot-ai/web
 npm install
-npm run dev
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000 npm run dev
 ```
 
 Open: <http://localhost:3000>
 
+> `NEXT_PUBLIC_API_BASE_URL` 미설정 시 기본값은 `http://localhost:8000`입니다.
+
 ## Notes
-- Checkup data is stored in `localStorage` keyed by mock `jobId`.
-- `mockReasonApi` simulates async latency and deterministic mock outputs.
-- Ready to swap with a real API by implementing `ReasonApi` contract.
+- 프론트는 아래 FastAPI 엔드포인트를 호출합니다.
+  - `POST /api/v1/checkups`
+  - `GET /api/v1/jobs/{jobId}`
+  - `GET /api/v1/checkups/{checkupId}`
+  - `POST /api/v1/checkups/{checkupId}/recompose`
+  - `POST /api/v1/checkups/{checkupId}/briefings`
+- processing 화면의 polling/timeout/failed fallback UX는 기존과 동일하게 유지됩니다.
+- API 응답의 `snake_case`는 클라이언트 어댑터에서 `camelCase`로 정규화됩니다.
 
 ---
 

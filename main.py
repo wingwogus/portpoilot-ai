@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from models import (
     MarketBriefingResponse,
@@ -37,6 +38,18 @@ app = FastAPI(
     title="PortPilot AI",
     description="Lightweight FastAPI prototype for portfolio + Reason MVP checkup APIs",
     version="0.2.0",
+)
+
+# FE local integration (Next.js dev server)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

@@ -48,6 +48,10 @@ class CheckupCreateResponse(BaseModel):
     checkup_id: str = Field(..., description="생성된 체크업 ID")
     job_id: str = Field(..., description="비동기 작업 ID")
     status: str = Field(..., description="작업 상태")
+    result: Optional[Dict[str, Any]] = Field(
+        None,
+        description="/api/v1 공통 필드. 생성 직후에는 null",
+    )
 
 
 class JobResponse(BaseModel):
@@ -70,7 +74,12 @@ class CheckupFinding(BaseModel):
 
 class CheckupResponse(BaseModel):
     checkup_id: str
+    job_id: Optional[str] = Field(None, description="마지막으로 연관된 작업 ID")
     status: str
+    result: Optional[Dict[str, Any]] = Field(
+        None,
+        description="/api/v1 공통 필드. 상세 체크업 요약 페이로드",
+    )
     created_at: str
     updated_at: str
     request: CheckupCreateRequest
@@ -92,6 +101,9 @@ class BriefingRequest(BaseModel):
 
 class BriefingResponse(BaseModel):
     checkup_id: str
+    job_id: Optional[str] = Field(None, description="briefing 생성 요청과 연관된 checkup의 job ID")
+    status: str = Field(..., description="checkup의 현재 상태")
+    result: Dict[str, Any] = Field(..., description="/api/v1 공통 필드. FE 렌더링용 briefing payload")
     audience: str
     tone: str
     headline: str

@@ -18,6 +18,8 @@ export interface ReasonResult {
 export interface RecomposeInput {
   tone: "balanced" | "optimistic" | "conservative";
   focus: string;
+  jobId?: string;
+  checkupId?: string;
 }
 
 export interface RecomposeResult {

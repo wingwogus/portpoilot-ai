@@ -21,8 +21,9 @@ export default function CheckupPage() {
 
     setLoading(true);
     const payload = { goal: goal.trim(), concern: concern.trim(), horizonWeeks };
-    const { jobId } = await mockReasonApi.submitCheckup(payload);
-    router.push(`/processing?jobId=${jobId}`);
+    const { jobId, checkupId } = await mockReasonApi.submitCheckup(payload);
+    const query = checkupId ? `jobId=${jobId}&checkupId=${checkupId}` : `jobId=${jobId}`;
+    router.push(`/processing?${query}`);
   };
 
   return (
