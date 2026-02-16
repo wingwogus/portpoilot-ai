@@ -62,10 +62,12 @@ class SurveyRequest(BaseModel):
         aliases = {
             "보수": "보수적",
             "보수적": "보수적",
+            "안정형": "보수적",
             "중립": "중립",
             "중립형": "중립",
             "공격": "공격적",
             "공격적": "공격적",
+            "공격형": "공격적",
         }
         if normalized not in aliases:
             raise ValueError("risk_tolerance는 보수적/중립/공격적 중 하나여야 합니다.")
