@@ -1,34 +1,55 @@
-export type RiskLevel = "low" | "medium" | "high";
+export type RiskTolerance = "안정형" | "중립형" | "공격형";
 
-export interface CheckupInput {
+export type SurveyForm = {
+  age: number;
+  seedMoney: number;
+  riskTolerance: RiskTolerance;
+  goal: string;
+};
+
+export type PortfolioItem = {
+  ticker: string;
+  summary: string;
+  ratio: number;
+  reason: string;
+};
+
+export type PortfolioResponse = {
+  marketAnalysis: string;
+  summaryComment: string;
+  items: PortfolioItem[];
+};
+
+// legacy checkup flow types (보조 라우트 호환)
+export type CheckupInput = {
   goal: string;
   concern: string;
   horizonWeeks: number;
-}
+};
 
-export interface ReasonResult {
+export type ReasonResult = {
   score: number;
-  risk: RiskLevel;
+  risk: "low" | "medium" | "high";
   summary: string;
   strengths: string[];
   blindSpots: string[];
   recommendation: string;
-}
+};
 
-export interface RecomposeInput {
-  tone: "balanced" | "optimistic" | "conservative";
-  focus: string;
+export type RecomposeInput = {
   jobId?: string;
   checkupId?: string;
-}
+  tone: "balanced" | "optimistic" | "conservative";
+  focus: string;
+};
 
-export interface RecomposeResult {
+export type RecomposeResult = {
   reframedSummary: string;
   nextSteps: string[];
-}
+};
 
-export interface BriefingResult {
+export type BriefingResult = {
   headline: string;
   talkingPoints: string[];
   caveat: string;
-}
+};

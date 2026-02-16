@@ -238,6 +238,7 @@ def _mock_portfolio(request) -> Dict[str, Any]:
         "market_analysis": "현재는 금리/실적 이벤트 중심의 박스권 장세로, 주도 섹터(기술) 중심 전략과 방어 자산의 균형이 중요합니다.",
         "summary_comment": "변동성 구간에서는 핵심지수+주도섹터+완충자산의 3축이 유효합니다.",
         "items": items,
+        "source": "mock",
     }
 
 
@@ -329,18 +330,32 @@ def generate_portfolio_logic(request):
     context = WEEKLY_CONTEXT_SUMMARY or "데이터 부족"
 
     if USE_MOCK_OLLAMA:
-        return _mock_portfolio(request)
+        payload = _mock_portfolio(request)
+        return PortfolioResponse.model_validate(payload).model_dump()
 
-    return portfolio_chain.invoke(
-        {
-            "weekly_context": context,
-            "age": request.age,
-            "seed_money": request.seed_money,
-            "risk_tolerance": request.risk_tolerance,
-            "goal": request.goal,
-            "format_instructions": portfolio_parser.get_format_instructions(),
-        }
-    )
+    try:
+        llm_result = portfolio_chain.invoke(
+            {
+                "weekly_context": context,
+                "age": request.age,
+                "seed_money": request.seed_money,
+                "risk_tolerance": request.risk_tolerance,
+                "goal": request.goal,
+                "format_instructions": portfolio_parser.get_format_instructions(),
+            }
+        )
+    except Exception as e:
+        raise RuntimeError(f"Ollama 추론 실패: {e}") from e
+
+    if isinstance(llm_result, dict):
+        llm_result["source"] = "ollama"
+    else:
+        raise RuntimeError("Ollama 응답이 JSON 객체 형태가 아닙니다.")
+
+    try:
+        return PortfolioResponse.model_validate(llm_result).model_dump()
+    except Exception as e:
+        raise RuntimeError(f"Ollama 결과 검증 실패: {e}") from e
 
 
 # --- Reason MVP prototype service functions ---

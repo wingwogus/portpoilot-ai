@@ -8,9 +8,9 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 echo "[self-test] BASE_URL=$BASE_URL"
 
 python3 - <<'PY'
-import sys, json, time, urllib.request, urllib.error
+import os, sys, json, time, urllib.request, urllib.error
 
-BASE = "http://localhost:8000"
+BASE = os.getenv("BASE_URL", "http://localhost:8000")
 
 def req(method, path, data=None, headers=None):
     url = BASE + path
@@ -87,17 +87,22 @@ for k in ("job_id","checkup_id","status","result"):
 assert isinstance(briefing["result"], dict) and "bullets" in briefing["result"], "briefing result payload invalid"
 print("[ok] briefing common keys + FE payload")
 
-# 6) legacy compatibility
-status, _, _ = req("GET", "/market-briefing")
-assert status == 200, f"legacy market-briefing status={status}"
-status, _, _ = req("POST", "/generate-portfolio", data={
+# 6) core endpoint /generate-portfolio + source
+status, _, body = req("POST", "/generate-portfolio", data={
     "age":32,
-    "seed_money":30000,
+    "seed_money":30000000,
     "risk_tolerance":"중립",
     "goal":"장기 자산 증식"
 }, headers={"Content-Type":"application/json"})
-assert status == 200, f"legacy generate-portfolio status={status}"
-print("[ok] legacy endpoints compatible")
+assert status == 200, f"generate-portfolio status={status}"
+portfolio = jloads(body)
+assert portfolio.get("source") in ("mock", "ollama"), f"invalid source={portfolio.get('source')}"
+print("[ok] generate-portfolio + source")
+
+# 7) supplemental endpoint /market-briefing
+status, _, _ = req("GET", "/market-briefing")
+assert status == 200, f"market-briefing status={status}"
+print("[ok] market-briefing")
 
 print("\n✅ self-test passed")
 PY

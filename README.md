@@ -1,241 +1,137 @@
-# PortPilot AI - FastAPI Prototype (Reason MVP)
+# PortPilot AI - FastAPI (ETF Recommendation Core)
 
-Lightweight FastAPI backend prototype with:
-
-- Legacy endpoints (`/market-briefing`, `/generate-portfolio`) 유지
-- Reason MVP endpoints under `/api/v1`
-- In-memory data store + deterministic mock responses
-- Async job simulation for checkup generation
+사용자 성향 기반 ETF 추천 API(`/generate-portfolio`)를 핵심으로 정비한 백엔드입니다.
+기존 `/market-briefing`는 유지되며 부가 기능으로 동작합니다.
 
 ---
 
-## Run
+## 핵심 변경사항
 
-### Backend only
+1. `/generate-portfolio` 입력 검증 강화
+   - `age`: 19~100
+   - `seed_money`: 100,000 ~ 10,000,000,000
+   - `risk_tolerance`: `보수적 | 중립 | 공격적` (별칭 `보수/중립형/공격` 허용)
+   - `goal`: 2~200자
+2. 에러 메시지 개선
+   - FastAPI validation 에러를 `field/message` 구조로 반환
+3. `USE_MOCK_OLLAMA` 분기 명확화
+   - `true`: 명시적 Mock 추천 경로 사용
+   - `false`: Ollama 추론 경로 사용
+4. 응답에 `source` 필드 추가
+   - `mock | ollama`
+5. CORS 유지
+   - `http://localhost:3000`, `http://127.0.0.1:3000`
+
+---
+
+## 실행
+
 ```bash
 cd /home/node/.openclaw/workspace/portpoilot-ai
 python3 -m uvicorn main:app --reload --port 8000
 ```
 
-### Frontend + Backend together
+### 환경변수
+
 ```bash
-cd /home/node/.openclaw/workspace/portpoilot-ai
-./dev-up.sh
+# Mock 경로(기본값)
+export USE_MOCK_OLLAMA=true
+
+# 실제 Ollama 경로
+export USE_MOCK_OLLAMA=false
 ```
 
-Open:
-- Frontend: `http://localhost:3000`
-- Swagger: `http://localhost:8000/docs`
-
-`dev-up.sh` 동작 규칙:
-- 활성화된 `venv`(`$VIRTUAL_ENV`) 우선 사용
-- 없으면 `.venv` → `venv` → system `python3` 순서 fallback
-- macOS 기본 bash(3.x)에서도 동작 (`wait -n` 미사용)
-- 선택된 Python 환경에 `uvicorn`이 없으면 명확한 에러와 설치 가이드를 출력
+> `USE_MOCK_OLLAMA=false`일 때는 Ollama/LangChain 관련 의존성과 모델 준비가 필요합니다.
 
 ---
 
-## FE 실연동 안정화 포인트
+## API
 
-### 1) CORS 허용
-로컬 Next.js 연동을 위해 아래 origin 허용:
-- `http://localhost:3000`
-- `http://127.0.0.1:3000`
-
-### 2) `/api/v1` 공통 응답 필드 계약
-`/api/v1` 계열 응답은 아래 키를 **항상 포함**합니다.
-
-- `job_id` (없으면 `null` 가능)
-- `checkup_id`
-- `status`
-- `result` (없으면 `null` 가능)
-
-즉, FE는 공통적으로 다음 형태를 기준 파싱하면 됩니다:
-
-```json
-{
-  "job_id": "job_0001",
-  "checkup_id": "chk_0001",
-  "status": "COMPLETED",
-  "result": {}
-}
-```
-
-> 레거시 endpoint(`/market-briefing`, `/generate-portfolio`)는 기존 스키마를 그대로 유지합니다.
-
----
-
-## API Summary
-
-## Legacy (호환 유지)
-
-### `GET /market-briefing`
-Daily market briefing 반환.
-
-### `POST /generate-portfolio`
-기존 설문 기반 포트폴리오 반환.
-
----
-
-## Reason MVP (`/api/v1`)
-
-### 1) `POST /api/v1/checkups`
-체크업 생성 + 비동기 job 시작.
+## 1) Core: `POST /generate-portfolio`
 
 요청 예시:
+
 ```json
 {
-  "product_name": "Reason",
-  "service_url": "https://example.com",
-  "target_user": "초기 스타트업 PM",
-  "goal": "온보딩 전환율 개선",
-  "notes": "모바일 유입 비중 높음"
+  "age": 32,
+  "seed_money": 30000000,
+  "risk_tolerance": "중립",
+  "goal": "장기 자산 증식"
 }
 ```
 
-응답 예시:
+성공 응답 예시:
+
 ```json
 {
-  "checkup_id": "chk_0001",
-  "job_id": "job_0001",
-  "status": "PENDING",
-  "result": null
+  "market_analysis": "...",
+  "summary_comment": "...",
+  "items": [
+    {"ticker":"VOO","summary":"S&P500 추종","ratio":40,"reason":"기본 시장 노출"},
+    {"ticker":"SCHD","summary":"배당 성장","ratio":25,"reason":"현금흐름 안정성"},
+    {"ticker":"QQQ","summary":"기술 성장","ratio":15,"reason":"장기 성장성 보완"},
+    {"ticker":"TLT","summary":"미 장기채","ratio":20,"reason":"방어력 보강"}
+  ],
+  "source": "mock"
 }
 ```
 
-### 2) `GET /api/v1/jobs/{job_id}`
-비동기 작업 상태 확인.
+### 검증 에러 예시(422)
 
-응답 예시:
 ```json
 {
-  "job_id": "job_0001",
-  "status": "COMPLETED",
-  "checkup_id": "chk_0001",
-  "created_at": "2026-02-16T10:00:00Z",
-  "updated_at": "2026-02-16T10:00:02Z",
-  "result": {
-    "checkup_id": "chk_0001",
-    "overall_score": 74,
-    "verdict": "Promising"
-  },
-  "error": null
+  "error": "입력값 검증에 실패했습니다.",
+  "details": [
+    {"field":"age","message":"Input should be greater than or equal to 19"}
+  ]
 }
 ```
 
-### 3) `GET /api/v1/checkups/{checkup_id}`
-체크업 상세 조회.
+## 2) 부가 기능: `GET /market-briefing`
+- 기존 endpoint 유지
 
-응답 예시(완료 후):
-```json
-{
-  "checkup_id": "chk_0001",
-  "job_id": "job_0001",
-  "status": "COMPLETED",
-  "result": {
-    "overall_score": 74,
-    "verdict": "Promising",
-    "top_areas": ["Value Proposition", "Onboarding Flow", "Trust & Credibility"],
-    "next_actions": ["...", "...", "..."]
-  },
-  "created_at": "2026-02-16T10:00:00Z",
-  "updated_at": "2026-02-16T10:00:02Z",
-  "request": {"product_name": "Reason", "service_url": null, "target_user": "PM", "goal": "onboarding 개선", "notes": null},
-  "overall_score": 74,
-  "verdict": "Promising",
-  "findings": [],
-  "next_actions": [],
-  "recomposed_version": 1
-}
-```
-
-### 4) `POST /api/v1/checkups/{checkup_id}/recompose`
-focus 기반으로 결과 재구성. FE에서는 `result`와 `recomposed_version`을 같이 사용하면 버전 관리가 쉬움.
-
-요청:
-```json
-{ "focus": "onboarding" }
-```
-
-응답 구조:
-- 공통 필드: `job_id/checkup_id/status/result`
-- 상세 필드: 기존 checkup 상세와 동일 (`findings`, `next_actions`, `recomposed_version` 등)
-
-### 5) `POST /api/v1/checkups/{checkup_id}/briefings`
-체크업 결과를 요약 브리핑으로 변환.
-
-요청:
-```json
-{ "audience": "executive", "tone": "actionable" }
-```
-
-응답(FE friendly):
-```json
-{
-  "checkup_id": "chk_0001",
-  "job_id": "job_0001",
-  "status": "COMPLETED",
-  "result": {
-    "audience": "executive",
-    "tone": "actionable",
-    "headline": "Reason checkup: Promising (74/100)",
-    "summary": "...",
-    "bullets": ["...", "...", "..."],
-    "score": 74,
-    "verdict": "Promising",
-    "top_issues": ["Value Proposition", "Onboarding Flow", "Trust & Credibility"]
-  },
-  "audience": "executive",
-  "tone": "actionable",
-  "headline": "Reason checkup: Promising (74/100)",
-  "summary": "...",
-  "bullets": ["...", "...", "..."]
-}
-```
-
-`result`만 사용해도 렌더링 가능하도록 payload를 중복 제공했습니다.
+## 3) Reason MVP: `/api/v1/*`
+- 기존 체크업 관련 endpoint 유지
 
 ---
 
-## 실제 연동용 curl 예시
+## curl 예시
 
 ```bash
-# 0) CORS preflight 확인 (브라우저와 동일한 Origin)
-curl -i -X OPTIONS 'http://localhost:8000/api/v1/checkups' \
+# 0) CORS preflight
+curl -i -X OPTIONS 'http://localhost:8000/generate-portfolio' \
   -H 'Origin: http://localhost:3000' \
   -H 'Access-Control-Request-Method: POST'
 
-# 1) checkup 생성
-curl -s -X POST 'http://localhost:8000/api/v1/checkups' \
+# 1) 기본 성공 요청 (source 확인)
+curl -s -X POST 'http://localhost:8000/generate-portfolio' \
   -H 'Content-Type: application/json' \
   -d '{
-    "product_name":"Reason",
-    "target_user":"PM",
-    "goal":"onboarding 개선"
+    "age":32,
+    "seed_money":30000000,
+    "risk_tolerance":"중립",
+    "goal":"장기 자산 증식"
   }'
 
-# 2) job 상태 조회
-curl -s 'http://localhost:8000/api/v1/jobs/job_0001'
-
-# 3) checkup 상세 조회
-curl -s 'http://localhost:8000/api/v1/checkups/chk_0001'
-
-# 4) recompose
-curl -s -X POST 'http://localhost:8000/api/v1/checkups/chk_0001/recompose' \
+# 2) 잘못된 입력(검증 에러)
+curl -s -X POST 'http://localhost:8000/generate-portfolio' \
   -H 'Content-Type: application/json' \
-  -d '{"focus":"conversion"}'
+  -d '{
+    "age":15,
+    "seed_money":50000,
+    "risk_tolerance":"아무거나",
+    "goal":"x"
+  }'
 
-# 5) briefings
-curl -s -X POST 'http://localhost:8000/api/v1/checkups/chk_0001/briefings' \
-  -H 'Content-Type: application/json' \
-  -d '{"audience":"team","tone":"concise"}'
+# 3) 레거시/부가 기능 유지 확인
+curl -s 'http://localhost:8000/market-briefing'
 ```
 
 ---
 
 ## Self-test
 
-간단 검증 스크립트:
+서버 실행 후:
 
 ```bash
 cd /home/node/.openclaw/workspace/portpoilot-ai
@@ -243,9 +139,8 @@ bash scripts/self-test.sh
 ```
 
 검증 항목:
-1. CORS 헤더 (`Access-Control-Allow-Origin`) 존재
-2. `/api/v1/checkups` 공통 필드 (`job_id/checkup_id/status/result`) 확인
-3. `/api/v1/jobs/{job_id}` 동작 확인
-4. `/api/v1/checkups/{checkup_id}` 공통 필드 확인
-5. `/recompose`, `/briefings` 공통 필드 및 FE-friendly `result` 확인
-6. 레거시 endpoint (`/market-briefing`, `/generate-portfolio`) 호환 확인
+1. CORS preflight
+2. `/generate-portfolio` 기본 요청 성공
+3. 응답 `source` 필드(`mock|ollama`) 존재
+4. `/market-briefing` 동작
+5. `/api/v1` 기존 checkup 흐름 호환

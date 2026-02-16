@@ -1,5 +1,6 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Literal
+
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 # --- 섹터 및 브리핑 관련 ---
 class SectorInfo(BaseModel):
@@ -16,23 +17,73 @@ class MarketBriefingResponse(BaseModel):
 
 # --- 포트폴리오 관련 ---
 class PortfolioItem(BaseModel):
-    ticker: str = Field(..., description="티커")
-    summary: str = Field(..., description="설명")
-    ratio: int = Field(..., description="비중")
-    reason: str = Field(..., description="이유")
+    ticker: str = Field(..., min_length=1, description="티커")
+    summary: str = Field(..., min_length=2, description="설명")
+    ratio: int = Field(..., ge=5, le=100, description="비중")
+    reason: str = Field(..., min_length=2, description="이유")
+
+    @field_validator("ticker")
+    @classmethod
+    def normalize_ticker(cls, value: str) -> str:
+        return value.strip().upper()
+
+    @field_validator("ratio")
+    @classmethod
+    def ratio_step_check(cls, value: int) -> int:
+        if value % 5 != 0:
+            raise ValueError("ratio는 5 단위 정수여야 합니다.")
+        return value
 
 
 class PortfolioResponse(BaseModel):
-    market_analysis: str = Field(..., description="시장 분석")
-    summary_comment: str = Field(..., description="한줄평")
-    items: List[PortfolioItem] = Field(..., description="종목 리스트")
+    market_analysis: str = Field(..., min_length=10, description="시장 분석")
+    summary_comment: str = Field(..., min_length=5, description="한줄평")
+    items: List[PortfolioItem] = Field(..., min_length=1, description="종목 리스트")
+    source: Literal["mock", "ollama"] = Field(..., description="추천 생성 소스")
+
+    @model_validator(mode="after")
+    def validate_allocations(self):
+        total = sum(item.ratio for item in self.items)
+        if total != 100:
+            raise ValueError(f"포트폴리오 비중 합은 100이어야 합니다. 현재 {total}")
+        return self
 
 
 class SurveyRequest(BaseModel):
-    age: int
-    seed_money: int
-    risk_tolerance: str
-    goal: str
+    age: int = Field(..., ge=19, le=100, description="만 19~100세")
+    seed_money: int = Field(..., ge=100000, le=10_000_000_000, description="투자 가능 금액(원)")
+    risk_tolerance: str = Field(..., min_length=1, description="투자 성향")
+    goal: str = Field(..., min_length=2, max_length=200, description="투자 목표")
+
+    @field_validator("risk_tolerance")
+    @classmethod
+    def normalize_risk_tolerance(cls, value: str) -> str:
+        normalized = value.strip().lower()
+        aliases = {
+            "보수": "보수적",
+            "보수적": "보수적",
+            "중립": "중립",
+            "중립형": "중립",
+            "공격": "공격적",
+            "공격적": "공격적",
+        }
+        if normalized not in aliases:
+            raise ValueError("risk_tolerance는 보수적/중립/공격적 중 하나여야 합니다.")
+        return aliases[normalized]
+
+    @field_validator("goal")
+    @classmethod
+    def normalize_goal(cls, value: str) -> str:
+        value = value.strip()
+        if len(value) < 2:
+            raise ValueError("goal은 최소 2자 이상 입력해 주세요.")
+        return value
+
+    @model_validator(mode="after")
+    def age_seed_sanity_check(self):
+        if self.age <= 25 and self.seed_money > 2_000_000_000:
+            raise ValueError("입력값을 다시 확인해 주세요: age 대비 seed_money가 비정상적으로 큽니다.")
+        return self
 
 
 # --- Reason MVP Checkup API 관련 ---

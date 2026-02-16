@@ -1,7 +1,9 @@
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from models import (
     MarketBriefingResponse,
@@ -37,8 +39,26 @@ app = FastAPI(
     lifespan=lifespan,
     title="PortPilot AI",
     description="Lightweight FastAPI prototype for portfolio + Reason MVP checkup APIs",
-    version="0.2.0",
+    version="0.3.0",
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(_: Request, exc: RequestValidationError):
+    details = []
+    for err in exc.errors():
+        loc = ".".join(str(x) for x in err.get("loc", [])[1:])
+        msg = err.get("msg", "invalid value")
+        details.append({"field": loc, "message": msg})
+
+    return JSONResponse(
+        status_code=422,
+        content={
+            "error": "입력값 검증에 실패했습니다.",
+            "details": details,
+        },
+    )
+
 
 # FE local integration (Next.js dev server)
 app.add_middleware(
@@ -62,12 +82,16 @@ async def get_market_briefing():
     return data
 
 
-@app.post("/generate-portfolio", response_model=PortfolioResponse, tags=["legacy"])
+@app.post("/generate-portfolio", response_model=PortfolioResponse, tags=["core"])
 async def generate_portfolio(request: SurveyRequest):
     try:
         return generate_portfolio_logic(request)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except RuntimeError as e:
+        raise HTTPException(status_code=503, detail=str(e))
+    except Exception:
+        raise HTTPException(status_code=500, detail="포트폴리오 생성 중 알 수 없는 오류가 발생했습니다.")
 
 
 # --- Reason MVP checkup endpoints ---
