@@ -12,7 +12,7 @@ from models import (
     CheckupCreateRequest,
     CheckupFinding,
 )
-from etf_news_rag import ETFNewsRAGService
+from etf_news_rag import ETFNewsRAGService, JsonFileNewsProvider, RSSNewsProvider
 
 # 포트폴리오 추천은 무조건 실연동(Ollama) 사용. Mock 응답 금지 정책.
 USE_MOCK_OLLAMA = os.getenv("USE_MOCK_OLLAMA", "false").lower() in ("1", "true", "yes", "on")
@@ -21,7 +21,6 @@ if not USE_MOCK_OLLAMA:
     from langchain_ollama import ChatOllama
     from langchain_core.prompts import ChatPromptTemplate
     from langchain_core.output_parsers import JsonOutputParser
-    from langchain_community.tools import DuckDuckGoSearchRun
 
 
 REPORT_DIR = "reports"
@@ -30,7 +29,27 @@ os.makedirs(REPORT_DIR, exist_ok=True)
 DAILY_BRIEFING_DATA: Dict[str, Any] = {}
 WEEKLY_CONTEXT_SUMMARY: str = ""
 
-ETF_NEWS_RAG = ETFNewsRAGService(data_path="data/sample_etf_news.json", cache_ttl_seconds=300)
+ETF_NEWS_DATA_PATH = os.getenv("ETF_NEWS_DATA_PATH", "data/sample_etf_news.json")
+ETF_NEWS_PROVIDER = os.getenv("ETF_NEWS_PROVIDER", "json_file").strip().lower()
+ETF_NEWS_RSS_URLS = [
+    u.strip()
+    for u in os.getenv(
+        "ETF_NEWS_RSS_URLS",
+        "https://feeds.reuters.com/reuters/businessNews,https://feeds.reuters.com/news/wealth",
+    ).split(",")
+    if u.strip()
+]
+
+if ETF_NEWS_PROVIDER == "rss":
+    _news_provider = RSSNewsProvider(feed_urls=ETF_NEWS_RSS_URLS)
+else:
+    _news_provider = JsonFileNewsProvider(data_path=ETF_NEWS_DATA_PATH)
+
+ETF_NEWS_RAG = ETFNewsRAGService(
+    data_path=ETF_NEWS_DATA_PATH,
+    cache_ttl_seconds=300,
+    provider=_news_provider,
+)
 ETF_NEWS_INDEX_STATUS: Dict[str, Any] = {}
 
 # --- In-memory stores for Reason MVP prototype ---
@@ -42,7 +61,6 @@ _STORE_LOCK = asyncio.Lock()
 
 if not USE_MOCK_OLLAMA:
     llm = ChatOllama(model="gemma2:9b", temperature=0.0, format="json", seed=42)
-    search = DuckDuckGoSearchRun()
 
     briefing_parser = JsonOutputParser(pydantic_object=MarketBriefingResponse)
     briefing_prompt = ChatPromptTemplate.from_messages([
@@ -85,10 +103,24 @@ if not USE_MOCK_OLLAMA:
     portfolio_chain = portfolio_prompt | llm | portfolio_parser
 
 
+_SEARCH_CLIENT = None
+
+
 def _to_dict(model_obj: Any) -> Dict[str, Any]:
     if hasattr(model_obj, "model_dump"):
         return model_obj.model_dump()
     return model_obj.dict()
+
+
+def _get_search_client():
+    global _SEARCH_CLIENT
+    if _SEARCH_CLIENT is not None:
+        return _SEARCH_CLIENT
+
+    from langchain_community.tools import DuckDuckGoSearchRun
+
+    _SEARCH_CLIENT = DuckDuckGoSearchRun()
+    return _SEARCH_CLIENT
 
 
 def _now_iso() -> str:
@@ -249,6 +281,7 @@ def _mock_portfolio(request) -> Dict[str, Any]:
 async def fetch_news_sequentially():
     news_data = {}
     try:
+        search = _get_search_client()
         news_data["macro"] = search.invoke("US Fed interest rate inflation CPI PPI economy news today summary")
         await asyncio.sleep(1)
         news_data["sector"] = search.invoke("US stock market S&P 500 11 sectors performance winners and losers today summary")
@@ -256,7 +289,7 @@ async def fetch_news_sequentially():
         news_data["risk"] = search.invoke("US stock market geopolitical risk war oil price fear and greed index")
         return f"[거시경제 뉴스]: {news_data['macro']}\n[섹터별 뉴스]: {news_data['sector']}\n[시장 리스크]: {news_data['risk']}"
     except Exception as e:
-        print(f"⚠️ 검색 실패: {e}")
+        print(f"⚠️ 검색 실패(duckduckgo/ddgs 의존성 포함): {e}")
         return None
 
 
@@ -329,6 +362,32 @@ async def publish_daily_report():
     try:
         ETF_NEWS_INDEX_STATUS = ETF_NEWS_RAG.build_index()
     except Exception as e:
+        if ETF_NEWS_PROVIDER == "rss":
+            # RSS 공급원이 일시 실패하면 로컬 JSON으로 안전 폴백
+            fallback = ETFNewsRAGService(
+                data_path=ETF_NEWS_DATA_PATH,
+                cache_ttl_seconds=300,
+                provider=JsonFileNewsProvider(data_path=ETF_NEWS_DATA_PATH),
+            )
+            try:
+                fallback_status = fallback.build_index()
+                ETF_NEWS_RAG.docs = fallback.docs
+                ETF_NEWS_RAG.query_cache.clear()
+                ETF_NEWS_RAG.provider = JsonFileNewsProvider(data_path=ETF_NEWS_DATA_PATH)
+                ETF_NEWS_INDEX_STATUS = {
+                    **fallback_status,
+                    "provider": "json_file",
+                    "provider_detail": "json_file(fallback_from_rss)",
+                    "error": f"rss failed: {e}",
+                }
+                return
+            except Exception as fallback_error:
+                ETF_NEWS_INDEX_STATUS = {
+                    "error": f"rss failed: {e}; fallback failed: {fallback_error}",
+                    "indexed_docs": 0,
+                }
+                return
+
         ETF_NEWS_INDEX_STATUS = {"error": str(e), "indexed_docs": 0}
 
 
@@ -554,3 +613,15 @@ def search_etf_news(tickers: str, limit: int = 8, prefer_recent_hours: int = 96)
         limit=max(1, min(limit, 20)),
         prefer_recent_hours=max(12, min(prefer_recent_hours, 24 * 14)),
     )
+
+
+def get_etf_news_index_status() -> Dict[str, Any]:
+    status = ETF_NEWS_RAG.get_index_status()
+    if ETF_NEWS_INDEX_STATUS:
+        status.update({
+            "built_at": ETF_NEWS_INDEX_STATUS.get("built_at"),
+            "data_path": ETF_NEWS_INDEX_STATUS.get("data_path"),
+            "provider_detail": ETF_NEWS_INDEX_STATUS.get("provider_detail"),
+            "error": ETF_NEWS_INDEX_STATUS.get("error"),
+        })
+    return status

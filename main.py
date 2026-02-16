@@ -1,4 +1,7 @@
 from contextlib import asynccontextmanager
+import logging
+import time
+import uuid
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
@@ -17,6 +20,7 @@ from models import (
     BriefingRequest,
     BriefingResponse,
     ETFNewsResponse,
+    ETFNewsIndexStatusResponse,
 )
 from services import (
     publish_daily_report,
@@ -28,6 +32,7 @@ from services import (
     recompose_checkup,
     create_briefing,
     search_etf_news,
+    get_etf_news_index_status,
 )
 
 
@@ -44,9 +49,43 @@ app = FastAPI(
     version="0.3.0",
 )
 
+logger = logging.getLogger("portpilot.api")
+
+
+@app.middleware("http")
+async def request_context_middleware(request: Request, call_next):
+    request_id = request.headers.get("x-request-id") or str(uuid.uuid4())
+    request.state.request_id = request_id
+    started = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        logger.exception(
+            "request_failed",
+            extra={"request_id": request_id, "path": str(request.url.path), "method": request.method},
+        )
+        raise
+
+    duration_ms = round((time.perf_counter() - started) * 1000, 2)
+    status_class = f"{response.status_code // 100}xx"
+    logger.info(
+        "request_completed",
+        extra={
+            "request_id": request_id,
+            "path": str(request.url.path),
+            "method": request.method,
+            "status_code": response.status_code,
+            "status_class": status_class,
+            "duration_ms": duration_ms,
+        },
+    )
+    response.headers["X-Request-ID"] = request_id
+    response.headers["X-Process-Time-Ms"] = str(duration_ms)
+    return response
+
 
 @app.exception_handler(RequestValidationError)
-async def request_validation_exception_handler(_: Request, exc: RequestValidationError):
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError):
     details = []
     for err in exc.errors():
         loc = ".".join(str(x) for x in err.get("loc", [])[1:])
@@ -57,8 +96,23 @@ async def request_validation_exception_handler(_: Request, exc: RequestValidatio
         status_code=422,
         content={
             "error": "입력값 검증에 실패했습니다.",
+            "error_type": "validation_error",
             "details": details,
+            "request_id": getattr(request.state, "request_id", None),
         },
+    )
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.detail,
+            "error_type": "http_error",
+            "request_id": getattr(request.state, "request_id", None),
+        },
+        headers=exc.headers,
     )
 
 
@@ -142,3 +196,11 @@ async def get_etf_news(tickers: str, limit: int = 8, prefer_recent_hours: int = 
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"ETF 뉴스 검색 실패: {e}")
+
+
+@app.get("/etf-news/index-status", response_model=ETFNewsIndexStatusResponse, tags=["etf-news"])
+async def get_etf_news_health():
+    try:
+        return get_etf_news_index_status()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"ETF 뉴스 인덱스 상태 조회 실패: {e}")

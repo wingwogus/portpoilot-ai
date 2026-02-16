@@ -4,11 +4,160 @@ import json
 import math
 import os
 import re
+import urllib.request
+import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from email.utils import parsedate_to_datetime
+from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 
 TOKEN_RE = re.compile(r"[A-Za-z0-9']+")
+
+TICKER_QUERY_EXPANSION: Dict[str, List[str]] = {
+    "QQQ": ["nasdaq", "big tech", "ai", "semiconductor"],
+    "SCHD": ["dividend", "quality", "cash flow", "large cap value"],
+    "VOO": ["s&p 500", "broad market", "us large cap"],
+    "SPY": ["s&p 500", "broad market", "us large cap"],
+    "TLT": ["long treasury", "interest rate", "duration"],
+    "IWM": ["small cap", "russell 2000", "domestic growth"],
+    "XLE": ["energy", "oil", "gas"],
+    "XLK": ["technology", "software", "semiconductor"],
+}
+
+
+class NewsDataProvider(Protocol):
+    """Provider interface for ETF news source loading."""
+
+    name: str
+
+    def load_items(self) -> List[Dict[str, Any]]:
+        ...
+
+
+class JsonFileNewsProvider:
+    """Load ETF news items from a local JSON file (array of objects)."""
+
+    def __init__(self, data_path: str):
+        self.data_path = data_path
+        self.name = "json_file"
+
+    def load_items(self) -> List[Dict[str, Any]]:
+        if not os.path.exists(self.data_path):
+            raise FileNotFoundError(f"sample news data not found: {self.data_path}")
+
+        with open(self.data_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        if not isinstance(data, list) or not data:
+            raise ValueError("sample news data must be a non-empty JSON array")
+
+        return data
+
+
+class RSSNewsProvider:
+    """Load ETF news items from RSS feeds and normalize into RAG rows."""
+
+    def __init__(self, feed_urls: List[str], timeout_seconds: int = 8):
+        self.feed_urls = [u.strip() for u in feed_urls if u and u.strip()]
+        self.timeout_seconds = timeout_seconds
+        self.name = "rss"
+
+    def load_items(self) -> List[Dict[str, Any]]:
+        if not self.feed_urls:
+            raise ValueError("rss provider requires at least one feed url")
+
+        dedup: Dict[str, Dict[str, Any]] = {}
+        for feed_url in self.feed_urls:
+            for row in self._load_single_feed(feed_url):
+                # Keep the latest version when the same link appears across feeds.
+                key = str(row.get("url") or row.get("id") or "").strip()
+                if not key:
+                    continue
+                prev = dedup.get(key)
+                if prev is None or row.get("published_at", "") >= prev.get("published_at", ""):
+                    dedup[key] = row
+
+        rows = list(dedup.values())
+        if not rows:
+            raise ValueError("rss provider loaded zero items")
+
+        return rows
+
+    def _load_single_feed(self, feed_url: str) -> List[Dict[str, Any]]:
+        req = urllib.request.Request(feed_url, headers={"User-Agent": "PortPilot-RSS/1.0"})
+        with urllib.request.urlopen(req, timeout=self.timeout_seconds) as resp:
+            xml_bytes = resp.read()
+
+        root = ET.fromstring(xml_bytes)
+        items = root.findall("./channel/item")
+        rows: List[Dict[str, Any]] = []
+
+        for idx, item in enumerate(items, start=1):
+            title = self._text(item.find("title"))
+            link = self._text(item.find("link"))
+            description = self._text(item.find("description"))
+            pub_date_raw = self._text(item.find("pubDate"))
+
+            if not title or not link or not description:
+                continue
+
+            tickers = self._extract_tickers(f"{title} {description}")
+            sectors = self._extract_sectors(f"{title} {description}")
+            published_at = self._to_iso(pub_date_raw)
+
+            rows.append(
+                {
+                    "id": f"rss_{self._stable_hash(link)}_{idx:03d}",
+                    "title": title,
+                    "content": self._strip_tags(description),
+                    "url": link,
+                    "published_at": published_at,
+                    "tickers": tickers,
+                    "sectors": sectors,
+                }
+            )
+
+        return rows
+
+    def _extract_tickers(self, text: str) -> List[str]:
+        upper = text.upper()
+        candidates = sorted({t for t in TICKER_QUERY_EXPANSION if t in upper})
+        return candidates
+
+    def _extract_sectors(self, text: str) -> List[str]:
+        lowered = text.lower()
+        tags = []
+        if any(k in lowered for k in ["tech", "ai", "software", "semiconductor"]):
+            tags.append("Information Technology")
+        if any(k in lowered for k in ["energy", "oil", "gas"]):
+            tags.append("Energy")
+        if any(k in lowered for k in ["treasury", "bond", "yield", "rate"]):
+            tags.append("Fixed Income")
+        if any(k in lowered for k in ["small cap", "russell"]):
+            tags.append("Small Cap")
+        return sorted(set(tags))
+
+    def _to_iso(self, raw: str) -> str:
+        if not raw:
+            return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+        try:
+            dt = parsedate_to_datetime(raw)
+            if dt.tzinfo is not None:
+                dt = dt.astimezone(datetime.timezone.utc).replace(tzinfo=None)
+            return dt.replace(microsecond=0).isoformat() + "Z"
+        except Exception:
+            return datetime.datetime.utcnow().replace(microsecond=0).isoformat() + "Z"
+
+    def _stable_hash(self, value: str) -> str:
+        return hashlib.sha256(value.encode("utf-8")).hexdigest()[:10]
+
+    def _text(self, node: Optional[ET.Element]) -> str:
+        if node is None:
+            return ""
+        return (node.text or "").strip()
+
+    def _strip_tags(self, text: str) -> str:
+        return re.sub(r"<[^>]+>", " ", text).strip()
 
 
 @dataclass
@@ -29,15 +178,22 @@ class NewsDoc:
 class ETFNewsRAGService:
     """Lightweight built-in VectorDB + ETF news retrieval service."""
 
-    def __init__(self, data_path: str, cache_ttl_seconds: int = 300, embed_dim: int = 192):
+    def __init__(
+        self,
+        data_path: str,
+        cache_ttl_seconds: int = 300,
+        embed_dim: int = 192,
+        provider: Optional[NewsDataProvider] = None,
+    ):
         self.data_path = data_path
         self.cache_ttl_seconds = cache_ttl_seconds
         self.embed_dim = embed_dim
+        self.provider = provider or JsonFileNewsProvider(data_path=data_path)
         self.docs: List[NewsDoc] = []
         self.query_cache: Dict[str, Dict[str, Any]] = {}
 
     def build_index(self) -> Dict[str, Any]:
-        raw_items = self._load_sample_data()
+        raw_items = self.provider.load_items()
         docs: List[NewsDoc] = []
 
         for idx, row in enumerate(raw_items, start=1):
@@ -70,6 +226,7 @@ class ETFNewsRAGService:
         return {
             "indexed_docs": len(self.docs),
             "data_path": self.data_path,
+            "provider": self.provider.name,
             "built_at": self._now_iso(),
         }
 
@@ -78,12 +235,15 @@ class ETFNewsRAGService:
         if not normalized_tickers:
             return {
                 "query_tickers": [],
+                "query_expansion_terms": [],
                 "count": 0,
                 "cached": False,
                 "items": [],
             }
 
-        cache_key = f"{','.join(normalized_tickers)}|{limit}|{prefer_recent_hours}"
+        expanded_terms = self._expand_query_terms(normalized_tickers)
+
+        cache_key = f"{','.join(normalized_tickers)}|{'/'.join(expanded_terms)}|{limit}|{prefer_recent_hours}"
         cached = self.query_cache.get(cache_key)
         now_ts = self._now_timestamp()
 
@@ -92,10 +252,10 @@ class ETFNewsRAGService:
             payload["cached"] = True
             return payload
 
-        query_text = f"ETF news {' '.join(normalized_tickers)}"
+        query_text = self._build_query_text(normalized_tickers, expanded_terms)
         query_embedding = self._embed_text(query_text)
 
-        scored: List[Tuple[float, NewsDoc]] = []
+        scored: List[Tuple[float, float, float, float, NewsDoc]] = []
         for doc in self.docs:
             ticker_overlap = len(set(normalized_tickers) & set(doc.tickers))
             ticker_score = min(1.0, ticker_overlap / max(1, len(normalized_tickers)))
@@ -108,12 +268,12 @@ class ETFNewsRAGService:
             if ticker_overlap == 0 and final_score < 0.35:
                 continue
 
-            scored.append((final_score, doc))
+            scored.append((final_score, cosine, ticker_score, recency, doc))
 
         scored.sort(key=lambda x: x[0], reverse=True)
 
         items: List[Dict[str, Any]] = []
-        for score, doc in scored[:limit]:
+        for score, cosine, ticker_score, recency, doc in scored[:limit]:
             items.append(
                 {
                     "doc_id": doc.doc_id,
@@ -126,11 +286,13 @@ class ETFNewsRAGService:
                     "ticker_hits": sorted(set(doc.tickers) & set(normalized_tickers)),
                     "sector_tags": doc.sectors,
                     "score": round(float(score), 4),
+                    "score_explain": self._explain_score(cosine=cosine, ticker_score=ticker_score, recency=recency),
                 }
             )
 
         payload = {
             "query_tickers": normalized_tickers,
+            "query_expansion_terms": expanded_terms,
             "count": len(items),
             "cached": False,
             "items": items,
@@ -142,17 +304,24 @@ class ETFNewsRAGService:
         }
         return payload
 
-    def _load_sample_data(self) -> List[Dict[str, Any]]:
-        if not os.path.exists(self.data_path):
-            raise FileNotFoundError(f"sample news data not found: {self.data_path}")
+    def get_index_status(self) -> Dict[str, Any]:
+        return {
+            "indexed_docs": len(self.docs),
+            "cache_ttl_seconds": self.cache_ttl_seconds,
+            "embed_dim": self.embed_dim,
+            "cached_queries": len(self.query_cache),
+            "provider": self.provider.name,
+        }
 
-        with open(self.data_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-
-        if not isinstance(data, list) or not data:
-            raise ValueError("sample news data must be a non-empty JSON array")
-
-        return data
+    def _explain_score(self, cosine: float, ticker_score: float, recency: float) -> str:
+        semantic_w = 0.55 * cosine
+        ticker_w = 0.30 * ticker_score
+        recency_w = 0.15 * recency
+        return (
+            f"semantic={semantic_w:.3f}(55%), "
+            f"ticker={ticker_w:.3f}(30%), "
+            f"recency={recency_w:.3f}(15%)"
+        )
 
     def _normalize_news(self, row: Dict[str, Any]) -> Dict[str, Any]:
         title = str(row.get("title", "")).strip()
@@ -181,6 +350,28 @@ class ETFNewsRAGService:
             "tickers": tickers,
             "sectors": sectors,
         }
+
+    def _expand_query_terms(self, tickers: List[str], max_terms: int = 12) -> List[str]:
+        terms: List[str] = []
+        seen = set()
+
+        for ticker in tickers:
+            for term in TICKER_QUERY_EXPANSION.get(ticker, []):
+                key = term.lower().strip()
+                if not key or key in seen:
+                    continue
+                seen.add(key)
+                terms.append(term)
+                if len(terms) >= max_terms:
+                    return terms
+
+        return terms
+
+    def _build_query_text(self, tickers: List[str], expanded_terms: List[str]) -> str:
+        base = f"ETF news {' '.join(tickers)}"
+        if not expanded_terms:
+            return base
+        return f"{base} {' '.join(expanded_terms)}"
 
     def _embed_text(self, text: str) -> List[float]:
         vec = [0.0] * self.embed_dim

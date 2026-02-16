@@ -39,7 +39,7 @@ class PortfolioResponse(BaseModel):
     market_analysis: str = Field(..., min_length=10, description="시장 분석")
     summary_comment: str = Field(..., min_length=5, description="한줄평")
     items: List[PortfolioItem] = Field(..., min_length=1, description="종목 리스트")
-    source: Literal["mock", "ollama"] = Field(..., description="추천 생성 소스")
+    source: Literal["ollama"] = Field(..., description="추천 생성 소스")
 
     @model_validator(mode="after")
     def validate_allocations(self):
@@ -176,10 +176,24 @@ class ETFNewsItem(BaseModel):
     ticker_hits: List[str]
     sector_tags: List[str]
     score: float = Field(..., ge=0.0, le=1.0)
+    score_explain: str = Field(..., description="가중치 기반 점수 설명")
 
 
 class ETFNewsResponse(BaseModel):
     query_tickers: List[str]
+    query_expansion_terms: List[str] = Field(default_factory=list)
     count: int = Field(..., ge=0)
     cached: bool
     items: List[ETFNewsItem]
+
+
+class ETFNewsIndexStatusResponse(BaseModel):
+    indexed_docs: int = Field(..., ge=0)
+    cache_ttl_seconds: int = Field(..., ge=0)
+    embed_dim: int = Field(..., ge=1)
+    cached_queries: int = Field(..., ge=0)
+    provider: Optional[str] = None
+    provider_detail: Optional[str] = None
+    built_at: Optional[str] = None
+    data_path: Optional[str] = None
+    error: Optional[str] = None

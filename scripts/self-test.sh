@@ -27,6 +27,12 @@ def req(method, path, data=None, headers=None):
         body = e.read().decode("utf-8") if e.fp else ""
         headers = {k.lower(): v for k, v in (e.headers.items() if e.headers else [])}
         return e.code, headers, body
+    except urllib.error.URLError as e:
+        raise AssertionError(
+            "server not reachable. start backend first: "
+            "`USE_MOCK_OLLAMA=true python3 -m uvicorn main:app --port 8000` "
+            "(or install FastAPI deps if missing)"
+        ) from e
 
 def jloads(s):
     return json.loads(s)
@@ -42,12 +48,14 @@ assert aco in ("http://localhost:3000", "*"), f"allow-origin missing: {aco}"
 print("[ok] CORS preflight")
 
 # 1) create checkup
-status, _, body = req("POST", "/api/v1/checkups", data={
+status, hdrs, body = req("POST", "/api/v1/checkups", data={
     "product_name":"Reason",
     "target_user":"PM",
     "goal":"onboarding 개선"
-}, headers={"Content-Type":"application/json"})
+}, headers={"Content-Type":"application/json", "X-Request-ID": "selftest-checkups-001"})
 assert status == 200, f"checkups status={status}"
+assert hdrs.get("x-request-id") == "selftest-checkups-001", "x-request-id echo mismatch"
+assert hdrs.get("x-process-time-ms") is not None, "x-process-time-ms missing"
 create = jloads(body)
 for k in ("job_id","checkup_id","status","result"):
     assert k in create, f"missing key in create: {k}"
@@ -97,14 +105,25 @@ status, _, body = req("GET", "/etf-news?tickers=QQQ,SCHD&limit=5")
 assert status == 200, f"etf-news status={status}"
 news = jloads(body)
 assert news.get("count", 0) > 0, "etf-news should return at least one document"
+assert isinstance(news.get("query_expansion_terms"), list), "query_expansion_terms should be list"
 first = news["items"][0]
-for k in ("source_link", "summary", "signal", "evidence"):
+for k in ("source_link", "summary", "signal", "evidence", "score_explain"):
     assert k in first, f"missing key in etf-news item: {k}"
 assert first["signal"] in ("bullish", "bearish", "neutral"), f"invalid signal: {first['signal']}"
 assert isinstance(first["evidence"], list) and len(first["evidence"]) > 0, "evidence should be non-empty"
 print("[ok] etf-news rag retrieval + fields")
 
-# 7) core endpoint /generate-portfolio + source (ollama 미연결 환경 허용)
+# 7) ETF 뉴스 인덱스 상태 확인
+status, _, body = req("GET", "/etf-news/index-status")
+assert status == 200, f"index-status status={status}"
+idx = jloads(body)
+for k in ("indexed_docs", "cache_ttl_seconds", "embed_dim", "cached_queries", "provider"):
+    assert k in idx, f"missing key in index-status: {k}"
+assert idx["indexed_docs"] >= 1, "indexed_docs should be >= 1"
+assert idx["provider"] in ("json_file", "rss"), f"unexpected provider: {idx.get('provider')}"
+print("[ok] etf-news index-status + provider")
+
+# 8) core endpoint /generate-portfolio + source (ollama 미연결 환경 허용)
 status, _, body = req("POST", "/generate-portfolio", data={
     "age":32,
     "seed_money":30000000,
@@ -113,17 +132,40 @@ status, _, body = req("POST", "/generate-portfolio", data={
 }, headers={"Content-Type":"application/json"})
 if status == 200:
     portfolio = jloads(body)
-    assert portfolio.get("source") in ("mock", "ollama"), f"invalid source={portfolio.get('source')}"
+    assert portfolio.get("source") == "ollama", f"invalid source={portfolio.get('source')}"
     print("[ok] generate-portfolio + source")
 elif status == 503:
     err = jloads(body)
-    detail = str(err.get("detail", ""))
+    detail = str(err.get("detail") or err.get("error") or "")
     assert ("Ollama" in detail) or ("Mock" in detail), f"unexpected 503 detail: {detail}"
     print("[ok] generate-portfolio endpoint reachable (ollama unavailable in current env)")
 else:
     raise AssertionError(f"generate-portfolio unexpected status={status}, body={body}")
 
-# 8) supplemental endpoint /market-briefing
+# 9) validation error envelope
+status, hdrs, body = req("POST", "/generate-portfolio", data={
+    "age":15,
+    "seed_money":50000,
+    "risk_tolerance":"invalid",
+    "goal":"x"
+}, headers={"Content-Type":"application/json", "X-Request-ID": "selftest-validation-001"})
+assert status == 422, f"validation status={status}"
+assert hdrs.get("x-request-id") == "selftest-validation-001", "validation x-request-id echo mismatch"
+err = jloads(body)
+assert err.get("error_type") == "validation_error", f"validation error_type missing: {err}"
+assert isinstance(err.get("details"), list) and len(err["details"]) > 0, "validation details missing"
+assert err.get("request_id") == "selftest-validation-001", "validation request_id mismatch"
+print("[ok] validation error envelope")
+
+# 10) not-found error envelope
+status, _, body = req("GET", "/api/v1/jobs/job_not_found")
+assert status == 404, f"not-found status={status}"
+err = jloads(body)
+assert err.get("error_type") == "http_error", f"http error_type missing: {err}"
+assert isinstance(err.get("request_id"), str) and len(err["request_id"]) > 0, "http_error request_id missing"
+print("[ok] not-found error envelope")
+
+# 11) supplemental endpoint /market-briefing
 status, _, _ = req("GET", "/market-briefing")
 assert status == 200, f"market-briefing status={status}"
 print("[ok] market-briefing")
