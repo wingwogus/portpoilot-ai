@@ -77,8 +77,16 @@ function normalize(payload: unknown): EtfNewsCard[] {
   return [];
 }
 
-export async function fetchEtfNews(): Promise<EtfNewsCard[]> {
-  const response = await fetch(`${API_BASE}/etf-news`, {
+export async function fetchEtfNews(
+  tickers: string[] = ["QQQ", "SPY", "SOXX", "SMH", "VTI", "TLT"],
+): Promise<EtfNewsCard[]> {
+  const params = new URLSearchParams({
+    tickers: tickers.join(","),
+    limit: "8",
+    prefer_recent_hours: "96",
+  });
+
+  const response = await fetch(`${API_BASE}/etf-news?${params.toString()}`, {
     method: "GET",
     headers: { Accept: "application/json" },
     cache: "no-store",
