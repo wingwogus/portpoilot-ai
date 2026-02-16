@@ -24,6 +24,8 @@ python3 -m uvicorn main:app --reload --port 8000
 cd /home/node/.openclaw/workspace/portpoilot-ai
 ./dev-up.sh
 ```
+- `./dev-up.sh`는 `.venv/bin/python`이 있으면 자동으로 사용합니다.
+- `.venv`가 없으면 system `python3`로 fallback 됩니다.
 
 Open:
 - Frontend: `http://localhost:3000`

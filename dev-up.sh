@@ -23,10 +23,18 @@ if [[ ! -d "$WEB_DIR/node_modules" ]]; then
   (cd "$WEB_DIR" && npm install)
 fi
 
+PYTHON_BIN="python3"
+if [[ -x "$ROOT_DIR/.venv/bin/python" ]]; then
+  PYTHON_BIN="$ROOT_DIR/.venv/bin/python"
+  echo "[dev-up] Using venv python: $PYTHON_BIN"
+else
+  echo "[dev-up] .venv not found. Using system python3"
+fi
+
 echo "[dev-up] Starting FastAPI..."
 (
   cd "$ROOT_DIR"
-  python3 -m uvicorn main:app --reload --port "$API_PORT"
+  "$PYTHON_BIN" -m uvicorn main:app --reload --port "$API_PORT"
 ) &
 API_PID=$!
 
