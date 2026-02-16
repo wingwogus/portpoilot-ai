@@ -27,34 +27,31 @@ export default function CheckupPage() {
   };
 
   return (
-    <MobileShell
-      title="Checkup"
-      subtitle="Capture your objective and the main uncertainty. We’ll generate a fast Reason readout."
-    >
+    <MobileShell title="포트폴리오 체크업" subtitle="PC 기준 입력 화면입니다. 목표/리스크를 입력하면 빠르게 진단 결과를 생성합니다.">
       <Card>
-        <form className="space-y-4" onSubmit={onSubmit}>
-          <div>
-            <Label>What are you trying to achieve?</Label>
+        <form className="grid grid-cols-1 gap-4 md:grid-cols-2" onSubmit={onSubmit}>
+          <div className="md:col-span-2">
+            <Label>이번 투자 목표</Label>
             <input
               className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-300 focus:ring"
-              placeholder="e.g., Launch paid beta in one month"
+              placeholder="예: 3개월 내 변동성 줄이면서 수익률 개선"
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
             />
           </div>
 
-          <div>
-            <Label>Main concern / risk</Label>
+          <div className="md:col-span-2">
+            <Label>가장 걱정되는 리스크</Label>
             <textarea
-              className="min-h-24 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-300 focus:ring"
-              placeholder="What might fail?"
+              className="min-h-28 w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-300 focus:ring"
+              placeholder="예: 기술주 쏠림이 심하고 하락장 대응이 불안함"
               value={concern}
               onChange={(e) => setConcern(e.target.value)}
             />
           </div>
 
           <div>
-            <Label>Decision horizon (weeks)</Label>
+            <Label>의사결정 기간(주)</Label>
             <input
               className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm outline-none ring-indigo-300 focus:ring"
               type="number"
@@ -65,13 +62,15 @@ export default function CheckupPage() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={!canSubmit || loading}
-            className="w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-indigo-300"
-          >
-            {loading ? "Starting…" : "Run Reason Checkup"}
-          </button>
+          <div className="flex items-end">
+            <button
+              type="submit"
+              disabled={!canSubmit || loading}
+              className="w-full rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:bg-indigo-300"
+            >
+              {loading ? "진단 시작 중..." : "Reason 체크업 실행"}
+            </button>
+          </div>
         </form>
       </Card>
     </MobileShell>

@@ -10,32 +10,23 @@ import type {
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const makeResult = (input: CheckupInput): ReasonResult => ({
-  score: Math.min(95, 60 + input.goal.length % 30),
+  score: Math.min(95, 60 + (input.goal.length % 30)),
   risk: input.concern.length > 80 ? "high" : input.concern.length > 35 ? "medium" : "low",
-  summary: `For “${input.goal}”, momentum is possible within ${input.horizonWeeks} weeks if friction is reduced early.`,
-  strengths: [
-    "Clear objective defined",
-    "Time horizon is explicit",
-    "Action window identified",
-  ],
-  blindSpots: [
-    "Assumes consistent weekly execution",
-    "Missing explicit fallback path",
-    "External dependency risk not quantified",
-  ],
-  recommendation:
-    "Run a 2-week micro-pilot, track one leading metric daily, then decide to scale or pivot.",
+  summary: `목표 "${input.goal}" 기준으로 ${input.horizonWeeks}주 내 개선 여지가 있으며, 초기 마찰 구간 관리가 핵심입니다.`,
+  strengths: ["목표가 명확함", "기간이 구체적임", "실행 윈도우가 정의됨"],
+  blindSpots: ["주간 실행 일관성 가정이 큼", "대체 시나리오가 부족함", "외부 변수 리스크 정량화 미흡"],
+  recommendation: "2주 단위 마이크로 파일럿을 운영하고, 선행지표 1개를 매일 추적한 뒤 확장/수정 결정을 하세요.",
 });
 
 const makeBriefing = (result: ReasonResult): BriefingResult => ({
-  headline: `Reason signal: ${result.risk.toUpperCase()} risk, ${result.score}/100 confidence`,
+  headline: `Reason 시그널: 리스크 ${result.risk.toUpperCase()} · 신뢰점수 ${result.score}/100`,
   talkingPoints: [
     result.summary,
-    `Top strength: ${result.strengths[0]}`,
-    `Watchout: ${result.blindSpots[0]}`,
+    `핵심 강점: ${result.strengths[0]}`,
+    `주의 포인트: ${result.blindSpots[0]}`,
     result.recommendation,
   ],
-  caveat: "Mocked output for MVP prototype — replace with live model contract.",
+  caveat: "현재는 MVP 더미 결과입니다. 이후 실제 모델 응답으로 교체됩니다.",
 });
 
 export const mockReasonApi: ReasonApi = {
@@ -48,13 +39,13 @@ export const mockReasonApi: ReasonApi = {
     await wait(900);
 
     if (typeof window === "undefined") {
-      return makeResult({ goal: "Launch MVP", concern: "Unknown risk", horizonWeeks: 4 });
+      return makeResult({ goal: "MVP 출시", concern: "불확실한 리스크", horizonWeeks: 4 });
     }
 
     const raw = window.localStorage.getItem(`checkup:${jobId}`);
     const payload: CheckupInput = raw
       ? JSON.parse(raw)
-      : { goal: "Launch MVP", concern: "Unknown risk", horizonWeeks: 4 };
+      : { goal: "MVP 출시", concern: "불확실한 리스크", horizonWeeks: 4 };
 
     return makeResult(payload);
   },
@@ -64,17 +55,17 @@ export const mockReasonApi: ReasonApi = {
 
     const toneHint =
       input.tone === "optimistic"
-        ? "Bias to upside with controlled experiments"
+        ? "상방 가능성을 중심으로 실험 확장 관점에서 재구성"
         : input.tone === "conservative"
-          ? "Bias to downside protection and staged rollout"
-          : "Balanced upside/downside framing";
+          ? "하방 방어를 우선하는 단계적 전개 관점에서 재구성"
+          : "상방/하방 균형 관점에서 재구성";
 
     return {
-      reframedSummary: `${toneHint}. Focus area: ${input.focus}.`,
+      reframedSummary: `${toneHint}. 포커스: ${input.focus}`,
       nextSteps: [
-        "Clarify decision owner and decision deadline",
-        "Define a no-regret action for the next 48 hours",
-        "Add one objective kill-switch metric",
+        "의사결정 책임자와 마감 시점을 명확화",
+        "48시간 내 무조건 실행 가능한 무회귀 액션 1개 확정",
+        "중단 기준(킬 스위치) 지표 1개 지정",
       ],
     };
   },

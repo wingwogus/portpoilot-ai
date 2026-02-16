@@ -18,11 +18,11 @@ function BriefingContent() {
   }, [jobId]);
 
   if (!briefing) {
-    return <MobileShell title="Briefing" subtitle="Building your meeting-ready summary…" />;
+    return <MobileShell title="브리핑" subtitle="회의용 핵심 요약을 생성하는 중입니다..." />;
   }
 
   return (
-    <MobileShell title="Briefing" subtitle="Quick talking points for stakeholders.">
+    <MobileShell title="브리핑" subtitle="공유 가능한 형태의 핵심 포인트입니다.">
       <Card>
         <h2 className="text-base font-semibold">{briefing.headline}</h2>
         <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-slate-700">
@@ -34,7 +34,7 @@ function BriefingContent() {
       </Card>
 
       <Link href="/checkup" className="block rounded-xl border border-slate-300 bg-white px-4 py-2 text-center text-sm font-medium">
-        Start another checkup
+        새 체크업 시작
       </Link>
     </MobileShell>
   );
@@ -42,7 +42,7 @@ function BriefingContent() {
 
 export default function BriefingPage() {
   return (
-    <Suspense fallback={<MobileShell title="Briefing" subtitle="Preparing summary…" />}>
+    <Suspense fallback={<MobileShell title="브리핑" subtitle="요약 준비 중..." />}>
       <BriefingContent />
     </Suspense>
   );
