@@ -27,6 +27,12 @@ Open:
 - Frontend: `http://localhost:3000`
 - Swagger: `http://localhost:8000/docs`
 
+`dev-up.sh` 동작 규칙:
+- 활성화된 `venv`(`$VIRTUAL_ENV`) 우선 사용
+- 없으면 `.venv` → `venv` → system `python3` 순서 fallback
+- macOS 기본 bash(3.x)에서도 동작 (`wait -n` 미사용)
+- 선택된 Python 환경에 `uvicorn`이 없으면 명확한 에러와 설치 가이드를 출력
+
 ---
 
 ## FE 실연동 안정화 포인트
