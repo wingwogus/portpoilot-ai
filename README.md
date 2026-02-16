@@ -14,11 +14,11 @@
    - `goal`: 2~200자
 2. 에러 메시지 개선
    - FastAPI validation 에러를 `field/message` 구조로 반환
-3. `USE_MOCK_OLLAMA` 분기 명확화
-   - `true`: 명시적 Mock 추천 경로 사용
-   - `false`: Ollama 추론 경로 사용
+3. Mock 응답 비활성화
+   - `/generate-portfolio`는 Ollama 실연동만 허용
+   - `USE_MOCK_OLLAMA=true`일 경우 명시적 에러 반환
 4. 응답에 `source` 필드 추가
-   - `mock | ollama`
+   - `ollama`
 5. CORS 유지
    - `http://localhost:3000`, `http://127.0.0.1:3000`
 
@@ -34,14 +34,12 @@ python3 -m uvicorn main:app --reload --port 8000
 ### 환경변수
 
 ```bash
-# Mock 경로(기본값)
-export USE_MOCK_OLLAMA=true
-
-# 실제 Ollama 경로
+# 기본값: false (실 Ollama 경로)
 export USE_MOCK_OLLAMA=false
 ```
 
-> `USE_MOCK_OLLAMA=false`일 때는 Ollama/LangChain 관련 의존성과 모델 준비가 필요합니다.
+> 정책상 `/generate-portfolio` Mock 응답은 비활성화되어 있습니다.
+> Ollama/LangChain 의존성과 모델(`gemma2:9b`)이 준비되어 있어야 합니다.
 
 ---
 

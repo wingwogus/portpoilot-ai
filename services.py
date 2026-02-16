@@ -13,8 +13,8 @@ from models import (
     CheckupFinding,
 )
 
-# Ollama는 현재 더미 모드로 운용
-USE_MOCK_OLLAMA = os.getenv("USE_MOCK_OLLAMA", "true").lower() in ("1", "true", "yes", "on")
+# 포트폴리오 추천은 무조건 실연동(Ollama) 사용. Mock 응답 금지 정책.
+USE_MOCK_OLLAMA = os.getenv("USE_MOCK_OLLAMA", "false").lower() in ("1", "true", "yes", "on")
 
 if not USE_MOCK_OLLAMA:
     from langchain_ollama import ChatOllama
@@ -330,8 +330,9 @@ def generate_portfolio_logic(request):
     context = WEEKLY_CONTEXT_SUMMARY or "데이터 부족"
 
     if USE_MOCK_OLLAMA:
-        payload = _mock_portfolio(request)
-        return PortfolioResponse.model_validate(payload).model_dump()
+        raise RuntimeError(
+            "Mock 포트폴리오 응답은 비활성화되었습니다. USE_MOCK_OLLAMA=false로 실행하고 Ollama를 연결하세요."
+        )
 
     try:
         llm_result = portfolio_chain.invoke(

@@ -88,10 +88,13 @@ if [[ "$PYTHON_BIN" == "python3" ]]; then
   echo "[dev-up] venv 미사용 또는 미구성. system python3 사용"
 fi
 
+USE_MOCK_OLLAMA="${USE_MOCK_OLLAMA:-false}"
+echo "[dev-up] USE_MOCK_OLLAMA=$USE_MOCK_OLLAMA"
+
 echo "[dev-up] Starting FastAPI..."
 (
   cd "$ROOT_DIR"
-  "$PYTHON_BIN" -m uvicorn main:app --reload --port "$API_PORT"
+  USE_MOCK_OLLAMA="$USE_MOCK_OLLAMA" "$PYTHON_BIN" -m uvicorn main:app --reload --port "$API_PORT"
 ) &
 API_PID=$!
 
