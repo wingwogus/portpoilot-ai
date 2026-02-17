@@ -1,0 +1,150 @@
+{
+  "collected_at": "2026-02-17T12:50:00Z",
+  "collection_mode": "event-first raw capture",
+  "items": [
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "로봇/AI/반도체",
+      "event_title": "Pentagon threatens to cut off Anthropic in AI safeguards dispute",
+      "source": "Reuters",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNcTBMLV8yOW0zaEFLM2owZ3kwbklGcjgyNlJFNjJJM2Y2em1qZHlLNjNwSG1oZWdWaXFMdjVLY3dOSGJUTWthNVZxSXNKU0F4UXdFSElIYktJVFcyZ2lSekIwN3dGVTNJYjJrV1pFQWY5Nng5RldmQWxJYXRSVFk5dnkxUXNSSFJJUEtNdmlsQUFHU0E4LWlEN3lJSWROR25LWl9Qa0FEaWwtRzVtWWFMOU52aE01ejlOeExJ?oc=5",
+      "published_at": "Tue, 17 Feb 2026 10:29:14 GMT",
+      "cause_hypothesis": "국방 분야 AI 도입이 빨라지며 안전성·통제권 기준 충돌이 계약 리스크로 부각.",
+      "key_facts": ["미 국방부-주요 AI업체 간 안전장치 이견 보도", "정부조달/국방 AI 공급망 리스크 이슈화"],
+      "market_links": ["AI 인프라/모델 공급사", "정부조달 수주주", "클라우드/반도체 수요 민감주"],
+      "macro_policy_link_hint": "미 정부의 AI 규제·조달 가이드라인 변화가 섹터 밸류에이션에 직접 영향."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "로봇/AI/반도체",
+      "event_title": "India's Adani to invest $100 billion in AI data centers over the next decade",
+      "source": "CNBC",
+      "url": "https://news.google.com/rss/articles/CBMigAFBVV95cUxQNURKZTFoRGVWUFRmUmh1b1M1QnNTX0stQ24tdjZ2WFo3eC1pcFc1ZXZkQWpKUm42SVVaN0VscVpjOTZxVDltOXNLbFl5Z2d1QWFkeWN2U0xwSUNHMGUxY0tMZldkUXBRb0ZEbWY0TlU1anNQZ3lUVFVtRkJoMDFtctIBhgFBVV95cUxQMHh5WWhIdFBPaFkwZl9Wakl1RlN0ZHM4aUFwVGh6azNKYWc3VS03QW41Mk1uUWdmLUdRajdOc2M5OXF6SGpxSkZWZzhmRzdJSU5tbzFNUndPMGg2VFhFc19mWlJERHpJMmFpWnFFMWlaaXhMUEpVcXJiRm51Sm9OR3N0VVQwUQ?oc=5",
+      "published_at": "Tue, 17 Feb 2026 08:09:23 GMT",
+      "cause_hypothesis": "신흥국 데이터센터 수요와 AI 연산 경쟁 심화로 대규모 CAPEX 선점 투자 확대.",
+      "key_facts": ["10년 단위 초대형 AI 데이터센터 투자 계획 보도", "전력/냉각/반도체 공급망 동반 수요 예상"],
+      "market_links": ["GPU/HBM/서버", "전력설비·그리드", "데이터센터 REIT/건설"],
+      "macro_policy_link_hint": "금리·전력정책·산업보조금 방향에 따라 CAPEX 실행 속도 변동 가능."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "조선/해운/방산",
+      "event_title": "Davie Defense awarded USCG contract to build five Arctic Security Cutters",
+      "source": "navalnews.com",
+      "url": "https://news.google.com/rss/articles/CBMiuwFBVV95cUxNZnZ0dDRZYnBsclNJT1lsZFZRY2w2dmhsMlRuMm82bjJlUF9MbnhmNmotSGFVM0ZENjJFRm9qUGgwNDBtb0ZONlZ2bHl1LS1uSkFmZnZIZnZnSUpLaFUxLWUxSjBIMFBqXzc0YVVvTVMwMFdRWF8xNllncDVqSHhvUlRPQnJldDBUMHQ2TjQ1d0paZWh6dkNNUTJ0S1BMOGJiM1lwd3ZHX283Qm04QWVkb1VmSHF2QTFUQ3VZ?oc=5",
+      "published_at": "Tue, 17 Feb 2026 05:29:04 GMT",
+      "cause_hypothesis": "북극 항로·안보 이슈 확대로 쇄빙·극지 경비 선박 발주 증가.",
+      "key_facts": ["미 해안경비대 관련 신규 함정 계약 보도", "군/준군 수요가 상선 사이클과 별개로 지속"],
+      "market_links": ["특수선 조선사", "해양 방산 체인", "강재·추진체계"],
+      "macro_policy_link_hint": "국방예산 우선순위와 지정학 리스크가 장기 수주 잔고를 좌우."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "조선/해운/방산",
+      "event_title": "Godby Shipping orders two Ro-Ro vessels from Chinese builder",
+      "source": "Baird Maritime",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQbnJIeVY5R1VmRUU5WGxWdThha3NLcGFvSFY5M0paX245cEgzNWtBVWRsdlpsYUZUOGE1QUZqcTVNSXQ5UUZOZjVOUUhScDJkeS1rRVA5emthbno2M3IzOWQybzZHejBMaW4tQm9pSXJwbFJrNFJCb180VDRwRW5kLV93bnJFUlNsdFNtTnk4MTNnYWhMSW9ZejdrQ3d1bmVUTnVNcm82bWF5WEU1WGwyTWlHSGxmdw?oc=5",
+      "published_at": "Tue, 17 Feb 2026 08:11:08 GMT",
+      "cause_hypothesis": "완성차·트레일러 물동량 대응 및 친환경 선대 전환 수요.",
+      "key_facts": ["Ro-Ro 선박 2척 신규 발주", "중국 조선소 수주 경쟁력 확인"],
+      "market_links": ["상선 조선주", "해운 운임/용선", "후판·선박기자재"],
+      "macro_policy_link_hint": "무역정책·관세 변화가 차량 해상운송량과 선복 투자 결정을 자극."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "에너지(원유/LNG/전력/원전)",
+      "event_title": "The US is beefing up its nuclear power supply chain",
+      "source": "Bloomberg.com",
+      "url": "https://news.google.com/rss/articles/CBMiqAFBVV95cUxNZml1bVBCN2JlRGVsMWRlNUdVTEZTMV9HQUk2dFgzQjlKS1g3dXNvNHhFdjRDb21pOTYxa2R1a2M4WnFCOUF6Rml1RllkSC15aG5JVDJZUmVTNWJCVVlwSFhybFRDS05EcUoyazJYX2YzVkxDOXo1N0MzUDFKTkRvSW1tQXBrNkNBMUJNRE1ITXVubnp3Z0xEOU01QnkzYTZvMExadXNjd3M?oc=5",
+      "published_at": "Tue, 17 Feb 2026 12:13:54 GMT",
+      "cause_hypothesis": "전력수요 증가(AI/DC)와 에너지안보 강화로 원전 밸류체인 재구축 가속.",
+      "key_facts": ["미국 원전 공급망 강화 동향 보도", "핵연료·부품·EPC 병목 완화 시도"],
+      "market_links": ["원전 기자재", "우라늄/핵연료", "전력 유틸리티"],
+      "macro_policy_link_hint": "산업정책·세액공제·허가절차가 프로젝트 경제성의 핵심 변수."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "에너지(원유/LNG/전력/원전)",
+      "event_title": "France confirms plan for six new nuclear power plants in energy roadmap",
+      "source": "NucNet",
+      "url": "https://news.google.com/rss/articles/CBMivgFBVV95cUxPdmE3WFVFamUwQ0N5cTd0eGstTlF2ZWFEcW0zNGRhVC1EaHdtcU5OR0FtOUhEZGFjWEtySl8tem5HTk45LWJXaktEdWRFb2lyWkFRTFEzUHJ3WG5rb1UzS20zU0lRWmRCSmlpQlpYcF8taVc5WmN5S0lxc0xDVWZQcURPYlRfN09aUVlGT2JKal9nWC1RTzZuX0dzbTZxdC1jNEN4amV4OVBDZ1ltYV8zUlpzZ0ZGN2NudXE0ajlR?oc=5",
+      "published_at": "Tue, 17 Feb 2026 04:30:51 GMT",
+      "cause_hypothesis": "유럽의 기저전원 확보 필요성과 탄소감축 목표가 신규 원전 정책을 견인.",
+      "key_facts": ["프랑스 에너지 로드맵에서 신규 원전 6기 계획 확인", "중장기 전력 믹스 재편 시그널"],
+      "market_links": ["유럽 유틸리티", "원전 EPC/부품", "탄소배출권/가스대체"],
+      "macro_policy_link_hint": "EU 에너지안보·탄소정책과 통화정책(할인율)이 대형 인프라 투자 결정에 연동."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "자동차/배터리/전기차",
+      "event_title": "Suzuki launches maiden EV in India with battery rental plan",
+      "source": "Reuters",
+      "url": "https://news.google.com/rss/articles/CBMiswFBVV95cUxQQ24wWVJNV2dXcFRROUdhQXlYaGZUeDRYYnRlMTBCdVFhdzJyRWQzNmx0QU5tZFVNNlFFOEZKeFVvdVVmWC1KcWNsTVZXUmFPczRyNTIyUTlvcnY3NDh5SzhlZDlWbWJDcDFsVVhMNk56b19KM19odXlvNjNmMjZpbUVSWThqSUI0eWhPWHpaRWp3NjFPR3Axenhfd3FEeEpJaUxWaGRBTjBGc3JTeWFIaEtjRQ?oc=5",
+      "published_at": "Tue, 17 Feb 2026 09:15:54 GMT",
+      "cause_hypothesis": "신흥시장 EV 보급 확산을 위해 초기 구매비용을 낮추는 배터리 분리 과금 모델 채택.",
+      "key_facts": ["스즈키 인도 첫 EV 출시", "배터리 렌탈(리스) 방식 포함"],
+      "market_links": ["완성차 OEM", "배터리 리스/교환", "인도 EV 생태계"],
+      "macro_policy_link_hint": "소비금리·보조금·수입관세 정책이 EV 침투율 속도를 좌우."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "자동차/배터리/전기차",
+      "event_title": "Mercedes recalls EQB EV again over battery fire risk",
+      "source": "InsideEVs",
+      "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPYndjNEQyZ0FhQ1J0U1RfTkFRRFJZeDJTTWlHQjRZck1GNV9JZElLVFRRdWw4ZkpKM2JTWTB3VEJmcmFlRlNyeS1ETndzTDRXZjRra2JDLWpFaWZMZzdNWkc5b3pIRmFBYkdySDZCVE9lNmo2bzJURnpqSGF1RXpVcVluakxPUlI4enc?oc=5",
+      "published_at": "Tue, 17 Feb 2026 12:18:00 GMT",
+      "cause_hypothesis": "고에너지밀도 팩 안전성·열관리 이슈가 품질비용 및 브랜드 리스크를 재부각.",
+      "key_facts": ["EQB 관련 추가 리콜 보도", "배터리 화재 리스크 대응 목적"],
+      "market_links": ["배터리 셀/팩", "완성차 품질충당금", "EV 보험·리스크"],
+      "macro_policy_link_hint": "안전규제 강화 시 인증비용·리드타임 증가로 EV 원가/수요에 영향."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "바이오/헬스케어",
+      "event_title": "FDA clears Cloudbreak Pharma IND for phase 2 presbyopia drop trials",
+      "source": "Eyes On Eyecare",
+      "url": "https://news.google.com/rss/articles/CBMivwFBVV95cUxONHR0R3p3V01rUk5NdVZ5dXZELWZtUjRUc05lRTRLTXJUYVppYkFYOTZma29fZXZ6VHhZMHFTNnZ1ZUNfSDVScHNWdG81YWVESmE2VkdHTFlmVkZkVUhtVjN3WFVjQkVia09fc1Jicmc4MzdROC1LSG1HT2pWM0NRTi1LLXdrb29DMlRldkxyWUUxVlZDZHVucF9DZ2hWMmRpdzh5Mm9OSFc5cWJiYVhEelBvb0hQNy1kY2tSdnVFbw?oc=5",
+      "published_at": "Tue, 17 Feb 2026 12:34:43 GMT",
+      "cause_hypothesis": "규제기관의 임상 진입 승인 이벤트가 중소 바이오 밸류 리레이팅 촉매로 작동.",
+      "key_facts": ["FDA IND 클리어 보도", "노안 점안제 2상 진입"],
+      "market_links": ["중소형 바이오", "CRO", "안과 치료제 파이프라인"],
+      "macro_policy_link_hint": "헬스케어 예산·약가정책·규제속도 변화가 바이오 자금조달 환경에 연동."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "바이오/헬스케어",
+      "event_title": "FDA updates peanut butter recall in 40 states",
+      "source": "6abc Philadelphia",
+      "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxNUmI4TzBrVlhabFJ3Y2xUZ1FwRXFpbUxwTFo3bEJONnVhUkdlQ2xWUlF0Ujg3VEJya2RKZnEwa2lmRkM5TDV3OXg1T3liMWlRcFVvN0FjU0EzaVJwQkZ4V2VCN3M2YlhpaEFqNk40T0ctSjFMaFJYQ3VYSmVWdlF6WTdydDZadWl0VmQ0NlhLZFJoV2M1SFhnaE9uY09hZ2N4RWI4dXZ5RzdLZ0pnT0x2MVZfbHNCUQ?oc=5",
+      "published_at": "Tue, 17 Feb 2026 01:01:26 GMT",
+      "cause_hypothesis": "식품안전 이슈 확산 시 리콜 비용·공급 차질·소비심리 영향이 동시 발생.",
+      "key_facts": ["40개 주 대상 리콜 업데이트 보도", "FDA 공중보건 경보 성격"],
+      "market_links": ["식품/유통", "헬스케어 안전규제", "소비재 리콜 비용"],
+      "macro_policy_link_hint": "규제기관 집행강도 강화 시 기업 컴플라이언스 비용 증가."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "인프라/원자재(구리/철강 등)",
+      "event_title": "BHP profit beats forecasts as copper tops iron ore earnings on AI-driven demand",
+      "source": "WMBD (Reuters pickup)",
+      "url": "https://news.google.com/rss/articles/CBMikwFBVV95cUxNWGk2UVlrRXhxX05SMHl2M0dDOEdBeUVZQzhOVUNwZFY3bFZJWG05ekdNdUphQ2NLQVRwaDRQQjd3b0tUVUQ1N3ZrZzNsX3JLOEhSUF9tTmtXMHRXZ3VXaktFQWNoRDFNYmtGSVN4b2hxT25qaUh6QUZ3Q3VmaUQxZGdWNXdNV3N6SEVqY3k2Tjd5R0U?oc=5",
+      "published_at": "Tue, 17 Feb 2026 10:34:19 GMT",
+      "cause_hypothesis": "AI·전력 인프라 확대로 구리 수요 탄력성이 철광석 대비 강화.",
+      "key_facts": ["BHP 실적에서 구리 이익기여 확대 보도", "철광석 의존도 완화 시그널"],
+      "market_links": ["구리 가격", "글로벌 광산주", "전력망/변압기 체인"],
+      "macro_policy_link_hint": "중국 경기·달러·실질금리 경로가 산업금속 상대강도 결정."
+    },
+    {
+      "collected_at": "2026-02-17T12:50:00Z",
+      "sector": "인프라/원자재(구리/철강 등)",
+      "event_title": "Lundin and BHP say Vicuna could be a copper mega-mine",
+      "source": "Finimize",
+      "url": "https://news.google.com/rss/articles/CBMiigFBVV95cUxPa1NHVGJpRW4tSzZxN09rQ3lmREI1UFMxQU9ZTHJpM3V6b0QwUUV0WjNvTFlZN2R2N2xROUgtZW16ak8tV0c2ZEVPek5fam1vUFF0d3NETVNyUVFCdnBCVmZqWDdCMHprNUNuNnA3VUlmanEyOHBxRjgwbmFVaDBFdE9QYk03UG51VFE?oc=5",
+      "published_at": "Tue, 17 Feb 2026 12:06:35 GMT",
+      "cause_hypothesis": "장기 구리 공급부족 전망에 따라 대형 광산 개발 옵션 가치 부각.",
+      "key_facts": ["Vicuna 프로젝트 대형 구리광산 잠재력 언급", "메이저 광산사 파이프라인 확장 시사"],
+      "market_links": ["구리 장기선물", "광산 CAPEX", "남미 자원개발 리스크"],
+      "macro_policy_link_hint": "자원민족주의·인허가·인프라 투자정책이 공급탄력성 핵심 변수."
+    }
+  ]
+}

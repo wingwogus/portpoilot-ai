@@ -1,0 +1,105 @@
+{
+  "round": "manual",
+  "collected_at_utc": "2026-02-17T01:12:40Z",
+  "role": "TREND-SCOUT",
+  "items": [
+    {
+      "id": "fed-fomc-20260128",
+      "region": "US",
+      "category": "monetary_policy",
+      "source": "Federal Reserve",
+      "published_at": "2026-01-28T19:00:00Z",
+      "title": "Federal Reserve issues FOMC statement",
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20260128a.htm",
+      "key_points": [
+        "정책금리 3.50~3.75% 동결",
+        "인플레이션은 여전히 다소 높은 수준",
+        "미란·월러 위원이 25bp 인하 소수의견"
+      ]
+    },
+    {
+      "id": "ecb-wage-tracker-20260211",
+      "region": "Euro Area",
+      "category": "inflation_wages",
+      "source": "ECB",
+      "published_at": "2026-02-11T09:00:00Z",
+      "title": "ECB wage tracker suggests wage pressure normalisation in 2026",
+      "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260211_1~dd029e0063.en.html",
+      "key_points": [
+        "임금트래커(unsmoothed) 2025년 3.0%, 2026년 2.7%",
+        "임금상승 압력의 점진적 정상화 시사",
+        "2026년 전반 임금 경로의 분산 축소"
+      ]
+    },
+    {
+      "id": "ecb-eurep-20260214",
+      "region": "Euro Area / Global",
+      "category": "liquidity_plumbing",
+      "source": "ECB",
+      "published_at": "2026-02-14T16:30:00Z",
+      "title": "ECB enhances repo facility for central banks (EUREP)",
+      "url": "https://www.ecb.europa.eu/press/pr/date/2026/html/ecb.pr260214~076e09a6cc.en.html",
+      "key_points": [
+        "비유로권 중앙은행 대상 유로 유동성 백스톱 기능 확대",
+        "상시 접근(standing access) 도입, 2026년 3분기 적용",
+        "분절화/변동성 국면에서 유로화 자금시장 안정 목적"
+      ]
+    },
+    {
+      "id": "china-cpi-202601",
+      "region": "China",
+      "category": "macro_data",
+      "source": "National Bureau of Statistics of China",
+      "published_at": "2026-02-12T00:00:00Z",
+      "title": "Consumer Price Index in January 2026",
+      "url": "https://www.stats.gov.cn/english/PressRelease/202602/t20260212_1962612.html",
+      "key_points": [
+        "CPI 전년동월비 +0.2%",
+        "식품 -0.7%, 비식품 +0.4%",
+        "근원(식품·에너지 제외) +0.8%"
+      ]
+    },
+    {
+      "id": "china-pmi-202601",
+      "region": "China",
+      "category": "activity_data",
+      "source": "NBS China / CFLP",
+      "published_at": "2026-02-02T00:00:00Z",
+      "title": "Purchasing Managers’ Index for January 2026",
+      "url": "https://www.stats.gov.cn/english/PressRelease/202602/t20260202_1962478.html",
+      "key_points": [
+        "제조업 PMI 49.3 (전월대비 -0.8p)",
+        "비제조업 PMI 49.4",
+        "종합 PMI 산출지수 49.8"
+      ]
+    },
+    {
+      "id": "iea-omr-202602",
+      "region": "Global",
+      "category": "energy_oil",
+      "source": "IEA",
+      "published_at": "2026-02-12T00:00:00Z",
+      "title": "Oil Market Report - February 2026",
+      "url": "https://www.iea.org/reports/oil-market-report-february-2026",
+      "key_points": [
+        "1월 지정학/공급차질로 유가 급등, Brent 약 $70/bbl",
+        "2026년 글로벌 공급 +2.4mb/d 예상, 수요증가 +0.85mb/d로 하향",
+        "공급 우위(재고 누적) 구조는 유지"
+      ]
+    },
+    {
+      "id": "cnbc-china-tech-shock-20260216",
+      "region": "US / China / Global",
+      "category": "equity_theme_ai",
+      "source": "CNBC",
+      "published_at": "2026-02-16T12:30:01Z",
+      "title": "China's tech shock threatens the U.S. AI monopoly",
+      "url": "https://www.cnbc.com/2026/02/16/chinas-tech-shock-ai-monopoly-us.html",
+      "key_points": [
+        "중국 AI 생태계의 비용경쟁력/공급망 우위 부각",
+        "미국 빅테크의 대규모 AI CAPEX 대비 ROI 의문 제기",
+        "미중 기술 프리미엄 재평가 내러티브 확산"
+      ]
+    }
+  ]
+}
