@@ -30,7 +30,7 @@ os.makedirs(REPORT_DIR, exist_ok=True)
 DAILY_BRIEFING_DATA: Dict[str, Any] = {}
 WEEKLY_CONTEXT_SUMMARY: str = ""
 
-ETF_NEWS_DATA_PATH = os.getenv("ETF_NEWS_DATA_PATH", "data/sample_etf_news.json")
+ETF_NEWS_DATA_PATH = os.getenv("ETF_NEWS_DATA_PATH", "data/etf_news_ko.json")
 ETF_NEWS_PROVIDER = os.getenv("ETF_NEWS_PROVIDER", "json_file").strip().lower()
 ETF_NEWS_RSS_URLS = [
     u.strip()

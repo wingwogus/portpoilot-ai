@@ -6,7 +6,8 @@
 기존 `/market-briefing`, `/api/v1/checkups`는 유지됩니다.
 
 프론트엔드(`web/`)는 아래를 포함한 ETF RAG MVP 화면을 제공합니다.
-- 홈 대시보드(`/`): `/etf-news`, `/etf-decision-brief` 요약 카드
+- 홈 대시보드(`/`): 섹터별 핫뉴스 카드 + ETF별 뉴스 카드
+- 홈 데이터 스키마: `data/fundmanage-home-feed.schema.json` (FundManage 에이전트 연동 기준)
 - 의사결정 브리프 전용(`/decision-brief`): 티커 직접 입력 조회
 - 설문/포트폴리오(`/survey`, `/portfolio-result`): `/generate-portfolio` 연동
 
@@ -20,7 +21,7 @@
    - `risk_tolerance`: `보수적 | 중립 | 공격적` (별칭 `보수/중립형/공격` 허용)
    - `goal`: 2~200자
 2. 내장 VectorDB 기반 ETF 뉴스 RAG 1차 구현
-   - 뉴스 수집/정규화 파이프라인: `data/sample_etf_news.json` 로드 후 정규화
+   - 뉴스 수집/정규화 파이프라인: `data/etf_news_ko.json` 로드 후 정규화 (한국어 전용)
    - 임베딩 저장: 해시 기반 임베딩(192-dim) 생성 후 메모리 VectorDB 인덱싱
    - 메타태그 저장: `tickers`, `sectors` 태그와 함께 검색
    - ETF별 검색 API 추가: `GET /etf-news?tickers=QQQ,SCHD`
@@ -54,7 +55,7 @@ export USE_MOCK_OLLAMA=false
 
 # ETF 뉴스 데이터 소스 경로 (기본: sample json)
 # 외부 수집 파이프라인 산출물로 교체 가능
-export ETF_NEWS_DATA_PATH=data/sample_etf_news.json
+export ETF_NEWS_DATA_PATH=data/etf_news_ko.json
 
 # ETF 뉴스 provider 선택: json_file | rss
 export ETF_NEWS_PROVIDER=json_file
@@ -165,7 +166,7 @@ export ETF_DECISION_BRIEF_DIR=/home/node/.openclaw/workspace/research-data/brief
   "provider": "json_file",
   "provider_detail": null,
   "built_at": "2026-02-16T13:40:00Z",
-  "data_path": "data/sample_etf_news.json",
+  "data_path": "data/etf_news_ko.json",
   "error": null
 }
 ```

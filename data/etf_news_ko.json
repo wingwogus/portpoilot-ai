@@ -1,0 +1,110 @@
+[
+  {
+    "id": "ko_001",
+    "title": "미국 반도체 수출 회복 기대에 기술주 투자심리 개선",
+    "content": "미국 반도체 업황 회복 기대가 커지면서 나스닥 대형 기술주 중심의 매수세가 유입됐다. AI 인프라 투자 확대 전망이 재확인되며 성장주 선호가 강화됐다.",
+    "url": "https://news.example.kr/markets/semiconductor-rebound",
+    "published_at": "2026-02-17T07:30:00Z",
+    "tickers": ["QQQ", "SOXX", "SMH"],
+    "sectors": ["Information Technology", "Semiconductors"]
+  },
+  {
+    "id": "ko_002",
+    "title": "미 10년물 금리 안정세로 성장주 밸류에이션 부담 완화",
+    "content": "미국 국채 금리가 단기 급등 이후 안정 흐름을 보이면서 기술주 밸류에이션 부담이 일부 완화됐다. 금리 민감도가 높은 ETF 중심으로 매수세가 회복됐다.",
+    "url": "https://news.example.kr/macro/us-yield-stable",
+    "published_at": "2026-02-17T06:20:00Z",
+    "tickers": ["QQQ", "SPY", "TLT"],
+    "sectors": ["Fixed Income", "Information Technology"]
+  },
+  {
+    "id": "ko_003",
+    "title": "미국 소비 지표 둔화 신호, 경기민감 업종 선별 장세",
+    "content": "최근 소비 관련 지표가 둔화 신호를 보이면서 경기민감 업종의 변동성이 확대됐다. 시장은 대형주 방어 성격과 이익 가시성이 높은 종목으로 쏠림을 보였다.",
+    "url": "https://news.example.kr/macro/us-consumption-slowdown",
+    "published_at": "2026-02-17T05:10:00Z",
+    "tickers": ["SPY", "VTI"],
+    "sectors": ["Consumer Discretionary", "Broad Market"]
+  },
+  {
+    "id": "ko_004",
+    "title": "국제유가 반등으로 에너지 섹터 이익 전망 상향",
+    "content": "중동 공급 리스크와 재고 감소 영향으로 국제유가가 반등했다. 에너지 기업의 단기 이익 전망이 상향되며 관련 ETF가 상대적 강세를 보였다.",
+    "url": "https://news.example.kr/commodities/oil-rebound",
+    "published_at": "2026-02-17T04:40:00Z",
+    "tickers": ["XLE", "SPY"],
+    "sectors": ["Energy"]
+  },
+  {
+    "id": "ko_005",
+    "title": "배당주 선호 확대, 변동성 국면에서 방어형 자금 유입",
+    "content": "시장 변동성이 높아지면서 배당 및 퀄리티 요인을 가진 자산으로 자금이 이동했다. 안정적 현금흐름을 보유한 대형주 중심 ETF가 주목받았다.",
+    "url": "https://news.example.kr/strategy/dividend-defensive-flow",
+    "published_at": "2026-02-17T03:15:00Z",
+    "tickers": ["SPY", "VTI"],
+    "sectors": ["Large Cap", "Defensive"]
+  },
+  {
+    "id": "ko_006",
+    "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+    "content": "글로벌 클라우드 사업자의 AI 서버 투자 계획이 유지되며 반도체 장비와 메모리 밸류체인 실적 기대가 이어졌다. 업황 선행지표도 개선 흐름을 보였다.",
+    "url": "https://news.example.kr/tech/ai-server-demand",
+    "published_at": "2026-02-16T23:45:00Z",
+    "tickers": ["SOXX", "SMH", "QQQ"],
+    "sectors": ["Information Technology", "Semiconductors"]
+  },
+  {
+    "id": "ko_007",
+    "title": "연준 인사들의 신중 발언, 채권시장 변동성 완화",
+    "content": "연준 인사들이 물가와 고용 흐름을 확인하며 신중하게 접근하겠다고 밝히자 채권시장의 변동성이 다소 진정됐다. 장기채 ETF는 낙폭을 일부 회복했다.",
+    "url": "https://news.example.kr/policy/fed-cautious-tone",
+    "published_at": "2026-02-16T22:20:00Z",
+    "tickers": ["TLT", "SPY"],
+    "sectors": ["Fixed Income", "Policy"]
+  },
+  {
+    "id": "ko_008",
+    "title": "미국 제조업 지표 개선, 경기 침체 우려 일부 완화",
+    "content": "제조업 신규주문 지표가 예상보다 양호하게 나오면서 경기 침체 우려가 일부 완화됐다. 광범위 시장 ETF와 산업재 관련 종목이 동반 반등했다.",
+    "url": "https://news.example.kr/macro/us-manufacturing-improves",
+    "published_at": "2026-02-16T20:05:00Z",
+    "tickers": ["SPY", "VTI"],
+    "sectors": ["Industrials", "Broad Market"]
+  },
+  {
+    "id": "ko_009",
+    "title": "빅테크 실적 가이던스 상향, 나스닥 주도주 강세",
+    "content": "주요 빅테크 기업이 다음 분기 실적 가이던스를 상향하면서 나스닥 주도주의 강세가 이어졌다. 클라우드와 AI 관련 매출 성장 기대가 핵심 배경이다.",
+    "url": "https://news.example.kr/earnings/bigtech-guidance-up",
+    "published_at": "2026-02-16T18:55:00Z",
+    "tickers": ["QQQ", "SPY"],
+    "sectors": ["Information Technology", "Communication Services"]
+  },
+  {
+    "id": "ko_010",
+    "title": "중소형주 자금 유입 둔화, 대형주 중심 선호 지속",
+    "content": "정책 불확실성과 금리 경로 경계감이 이어지며 중소형주로의 자금 유입이 둔화됐다. 투자자들은 상대적으로 실적 안정성이 높은 대형주에 집중했다.",
+    "url": "https://news.example.kr/strategy/smallcap-flow-slow",
+    "published_at": "2026-02-16T16:40:00Z",
+    "tickers": ["SPY", "VTI"],
+    "sectors": ["Large Cap", "Market Strategy"]
+  },
+  {
+    "id": "ko_011",
+    "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+    "content": "AI 데이터센터 확장에 필요한 전력 인프라 투자가 확대되며 관련 반도체 전방 수요 개선 기대가 커졌다. 섹터 전반에 긍정적 심리가 확산됐다.",
+    "url": "https://news.example.kr/tech/power-infra-demand",
+    "published_at": "2026-02-16T15:10:00Z",
+    "tickers": ["SMH", "SOXX", "QQQ"],
+    "sectors": ["Semiconductors", "Utilities", "Information Technology"]
+  },
+  {
+    "id": "ko_012",
+    "title": "리스크 자산 혼조, 포트폴리오 분산 필요성 재확인",
+    "content": "주요 자산군이 혼조세를 보이면서 단일 테마 집중보다 분산 투자 필요성이 강조됐다. 광범위 시장 ETF와 채권 ETF를 함께 활용하는 전략이 부각됐다.",
+    "url": "https://news.example.kr/strategy/diversification-check",
+    "published_at": "2026-02-16T13:35:00Z",
+    "tickers": ["VTI", "SPY", "TLT"],
+    "sectors": ["Broad Market", "Fixed Income"]
+  }
+]

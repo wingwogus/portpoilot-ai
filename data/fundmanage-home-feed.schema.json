@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "FundManage Home Feed",
+  "description": "홈 화면(섹터 카드 + ETF 카드) 렌더링용 표준 데이터 구조",
+  "type": "object",
+  "properties": {
+    "generated_at": { "type": "string", "format": "date-time" },
+    "locale": { "type": "string", "const": "ko-KR" },
+    "sector_cards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "sector": { "type": "string" },
+          "etf_count": { "type": "integer", "minimum": 0 },
+          "hot_news": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "url": { "type": "string" },
+                "source": { "type": "string" },
+                "ticker": { "type": "string" }
+              },
+              "required": ["title", "url", "ticker"]
+            }
+          }
+        },
+        "required": ["sector", "etf_count", "hot_news"]
+      }
+    },
+    "etf_cards": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "properties": {
+          "ticker": { "type": "string" },
+          "summary": { "type": "string" },
+          "signal": { "type": "string", "enum": ["bullish", "neutral", "bearish"] },
+          "updated_at": { "type": "string" },
+          "sectors": { "type": "array", "items": { "type": "string" } },
+          "news": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "url": { "type": "string" },
+                "source": { "type": "string" }
+              },
+              "required": ["title", "url"]
+            }
+          }
+        },
+        "required": ["ticker", "summary", "signal", "news"]
+      }
+    }
+  },
+  "required": ["generated_at", "locale", "sector_cards", "etf_cards"]
+}

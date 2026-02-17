@@ -11,7 +11,8 @@ from email.utils import parsedate_to_datetime
 from typing import Any, Dict, List, Optional, Protocol, Tuple
 
 
-TOKEN_RE = re.compile(r"[A-Za-z0-9']+")
+TOKEN_RE = re.compile(r"[A-Za-z0-9가-힣']+")
+HANGUL_RE = re.compile(r"[가-힣]")
 
 TICKER_QUERY_EXPANSION: Dict[str, List[str]] = {
     "QQQ": ["nasdaq", "big tech", "ai", "semiconductor"],
@@ -341,6 +342,13 @@ class ETFNewsRAGService:
         if not title or not content or not url:
             raise ValueError("each news row requires title/content/url")
 
+        # 한국어 뉴스 우선 정책: 한글 비중이 너무 낮은 데이터는 제외
+        merged_text = f"{title} {content}"
+        hangul_count = len(HANGUL_RE.findall(merged_text))
+        alpha_count = len(re.findall(r"[A-Za-z]", merged_text))
+        if hangul_count == 0 or (alpha_count > 0 and hangul_count / max(1, alpha_count) < 0.15):
+            raise ValueError("korean-only policy: non-korean article filtered")
+
         return {
             "id": row.get("id"),
             "title": title,
@@ -406,9 +414,9 @@ class ETFNewsRAGService:
             return []
 
         signal_keywords = {
-            "bullish": ["surge", "beat", "growth", "upgrade", "rally", "strong"],
-            "bearish": ["drop", "fall", "cut", "risk", "miss", "weak"],
-            "neutral": ["mixed", "stable", "flat", "unchanged"],
+            "bullish": ["surge", "beat", "growth", "upgrade", "rally", "strong", "상승", "호조", "개선", "반등"],
+            "bearish": ["drop", "fall", "cut", "risk", "miss", "weak", "하락", "둔화", "악화", "부진"],
+            "neutral": ["mixed", "stable", "flat", "unchanged", "혼조", "중립", "관망", "보합"],
         }
         kws = signal_keywords.get(signal, [])
 
@@ -427,8 +435,14 @@ class ETFNewsRAGService:
 
     def _infer_signal(self, text: str) -> str:
         lowered = text.lower()
-        bull = ["surge", "beat", "upgrade", "rally", "strong", "expand", "record", "growth"]
-        bear = ["drop", "fall", "downgrade", "risk", "miss", "weak", "slump", "cut"]
+        bull = [
+            "surge", "beat", "upgrade", "rally", "strong", "expand", "record", "growth",
+            "상승", "반등", "호조", "개선", "확대", "강세", "회복", "상향",
+        ]
+        bear = [
+            "drop", "fall", "downgrade", "risk", "miss", "weak", "slump", "cut",
+            "하락", "둔화", "악화", "축소", "약세", "부진", "경계", "우려",
+        ]
 
         b_score = sum(lowered.count(k) for k in bull)
         s_score = sum(lowered.count(k) for k in bear)
