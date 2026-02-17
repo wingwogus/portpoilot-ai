@@ -7,6 +7,16 @@ import { type EtfNewsCard, fetchEtfNews } from "@/lib/api/etf-news-client";
 
 type ViewState = "loading" | "ready" | "empty" | "error";
 
+type UnifiedCard = {
+  ticker: string;
+  name?: string;
+  summary: string;
+  updatedAt?: string;
+  news: EtfNewsCard["news"];
+  signal: "bullish" | "neutral" | "bearish";
+  decision?: DecisionCard;
+};
+
 const signalLabel = {
   bullish: "강세 시그널",
   neutral: "중립 시그널",
@@ -27,53 +37,6 @@ function formatUpdatedAt(value?: string) {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
-}
-
-function EtfCard({ card }: { card: EtfNewsCard }) {
-  return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <header className="mb-4 flex items-start justify-between gap-3">
-        <div>
-          <h3 className="text-lg font-semibold text-slate-900">{card.ticker}</h3>
-          <p className="text-sm text-slate-500">{card.name ?? "ETF"}</p>
-        </div>
-        <span
-          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${signalClass[card.signal]}`}
-        >
-          {signalLabel[card.signal]}
-        </span>
-      </header>
-
-      <p className="mb-4 text-sm leading-6 text-slate-700">{card.summary}</p>
-
-      <section aria-label={`${card.ticker} 관련 뉴스`}>
-        <h4 className="mb-2 text-sm font-semibold text-slate-800">연관 뉴스</h4>
-        {card.news.length > 0 ? (
-          <ul className="space-y-2">
-            {card.news.slice(0, 3).map((news) => (
-              <li key={`${card.ticker}-${news.url}`}>
-                <a
-                  href={news.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
-                >
-                  {news.title}
-                  {news.source ? <span className="ml-2 text-xs text-slate-500">· {news.source}</span> : null}
-                </a>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500">표시할 뉴스가 없습니다.</p>
-        )}
-      </section>
-
-      <footer className="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">
-        업데이트: <time dateTime={card.updatedAt}>{formatUpdatedAt(card.updatedAt)}</time>
-      </footer>
-    </article>
-  );
 }
 
 export function DecisionCardView({ card }: { card: DecisionCard }) {
@@ -116,24 +79,107 @@ export function DecisionCardView({ card }: { card: DecisionCard }) {
   );
 }
 
+function UnifiedEtfCard({ card }: { card: UnifiedCard }) {
+  return (
+    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+      <header className="mb-4 flex items-start justify-between gap-3">
+        <div>
+          <h3 className="text-lg font-semibold text-slate-900">{card.ticker}</h3>
+          <p className="text-sm text-slate-500">{card.name ?? "ETF"}</p>
+        </div>
+        <span
+          className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${signalClass[card.signal]}`}
+        >
+          {signalLabel[card.signal]}
+        </span>
+      </header>
+
+      <section aria-label={`${card.ticker} 뉴스 요약`}>
+        <h4 className="mb-2 text-sm font-semibold text-slate-800">카드뉴스 요약</h4>
+        <p className="text-sm leading-6 text-slate-700">{card.summary}</p>
+      </section>
+
+      <section className="mt-4" aria-label={`${card.ticker} 의사결정 브리프`}>
+        <h4 className="mb-2 text-sm font-semibold text-slate-800">의사결정 브리프</h4>
+        {card.decision ? (
+          <>
+            <p className="text-sm leading-6 text-slate-800">{card.decision.conclusion}</p>
+            <p className="mt-1 text-xs text-slate-500">신뢰도 {Math.round(card.decision.confidence * 100)}%</p>
+          </>
+        ) : (
+          <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500">브리프 데이터가 아직 준비되지 않았습니다.</p>
+        )}
+      </section>
+
+      <section className="mt-4" aria-label={`${card.ticker} 관련 뉴스`}>
+        <h4 className="mb-2 text-sm font-semibold text-slate-800">연관 뉴스</h4>
+        {card.news.length > 0 ? (
+          <ul className="space-y-2">
+            {card.news.slice(0, 3).map((news) => (
+              <li key={`${card.ticker}-${news.url}`}>
+                <a
+                  href={news.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+                >
+                  {news.title}
+                  {news.source ? <span className="ml-2 text-xs text-slate-500">· {news.source}</span> : null}
+                </a>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-500">표시할 뉴스가 없습니다.</p>
+        )}
+      </section>
+
+      <footer className="mt-4 border-t border-slate-100 pt-3 text-xs text-slate-500">
+        업데이트: <time dateTime={card.updatedAt}>{formatUpdatedAt(card.updatedAt)}</time>
+      </footer>
+    </article>
+  );
+}
+
 function LoadingGrid() {
   return (
     <div className="grid grid-cols-1 gap-5 xl:grid-cols-3 lg:grid-cols-2">
       {Array.from({ length: 6 }).map((_, idx) => (
-        <div key={idx} className="h-72 animate-pulse rounded-2xl border border-slate-200 bg-white p-5" />
+        <div key={idx} className="h-80 animate-pulse rounded-2xl border border-slate-200 bg-white p-5" />
       ))}
     </div>
   );
 }
 
-function DecisionLoadingGrid() {
-  return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-      {Array.from({ length: 2 }).map((_, idx) => (
-        <div key={idx} className="h-56 animate-pulse rounded-2xl border border-slate-200 bg-white p-5" />
-      ))}
-    </div>
-  );
+function mergeByTicker(newsCards: EtfNewsCard[], decisionCards: DecisionCard[]): UnifiedCard[] {
+  const decisionMap = new Map(decisionCards.map((item) => [item.ticker, item]));
+  const merged = new Map<string, UnifiedCard>();
+
+  for (const news of newsCards) {
+    const decision = decisionMap.get(news.ticker);
+    merged.set(news.ticker, {
+      ticker: news.ticker,
+      name: news.name,
+      summary: news.summary,
+      updatedAt: news.updatedAt,
+      news: news.news,
+      signal: decision?.signal ?? news.signal,
+      decision,
+    });
+  }
+
+  for (const decision of decisionCards) {
+    if (merged.has(decision.ticker)) continue;
+    merged.set(decision.ticker, {
+      ticker: decision.ticker,
+      summary: "뉴스 요약 정보가 없습니다.",
+      news: [],
+      signal: decision.signal,
+      decision,
+    });
+  }
+
+  return Array.from(merged.values());
 }
 
 export function HomeDashboard() {
@@ -153,7 +199,7 @@ export function HomeDashboard() {
       setCards(newsResult);
       setNewsState(newsResult.length > 0 ? "ready" : "empty");
 
-      const tickers = Array.from(new Set(newsResult.map((card) => card.ticker))).slice(0, 6);
+      const tickers = Array.from(new Set(newsResult.map((card) => card.ticker))).slice(0, 8);
       if (tickers.length === 0) {
         setDecisionCards([]);
         setDecisionState("empty");
@@ -181,15 +227,16 @@ export function HomeDashboard() {
   }, []);
 
   const updatedCount = useMemo(() => cards.filter((card) => card.updatedAt).length, [cards]);
+  const unifiedCards = useMemo(() => mergeByTicker(cards, decisionCards), [cards, decisionCards]);
 
   return (
     <section aria-labelledby="etf-dashboard-title" className="mt-8">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 id="etf-dashboard-title" className="text-2xl font-semibold text-slate-900">
-            ETF 뉴스 대시보드
+            ETF 통합 브리핑
           </h2>
-          <p className="mt-1 text-sm text-slate-600">ETF별 최신 시그널과 관련 뉴스를 한눈에 확인하세요.</p>
+          <p className="mt-1 text-sm text-slate-600">카드뉴스 + 의사결정 브리프를 ETF별 1카드로 통합해 제공합니다.</p>
         </div>
         <div className="flex items-center gap-2">
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">업데이트 보유 {updatedCount}개</span>
@@ -221,59 +268,29 @@ export function HomeDashboard() {
 
       {newsState === "ready" && (
         <>
+          {decisionState === "error" && (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              의사결정 브리프 API 연결에 실패했습니다. 뉴스 기반 카드만 우선 표시합니다.
+            </div>
+          )}
+
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
-            {cards.map((card, idx) => (
-              <EtfCard key={`${card.ticker}-${card.updatedAt ?? "na"}-${card.news[0]?.url ?? idx}`} card={card} />
+            {unifiedCards.map((card) => (
+              <UnifiedEtfCard key={`unified-${card.ticker}`} card={card} />
             ))}
           </div>
-
-          <section className="mt-10" aria-labelledby="decision-brief-title">
-            <header className="mb-4 flex items-end justify-between gap-3">
-              <div>
-                <h3 id="decision-brief-title" className="text-xl font-semibold text-slate-900">
-                  ETF 의사결정 브리프
-                </h3>
-                <p className="mt-1 text-sm text-slate-600">뉴스 요약에 더해, 티커별 인과 기반 결론을 함께 제공합니다.</p>
-              </div>
-              <Link href="/decision-brief" className="text-sm font-semibold text-blue-700 hover:text-blue-800">
-                티커 직접 조회 →
-              </Link>
-            </header>
-
-            {decisionState === "loading" && <DecisionLoadingGrid />}
-
-            {decisionState === "error" && (
-              <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                의사결정 브리프를 불러오지 못했습니다. 전용 페이지에서 다시 시도해 주세요.
-              </div>
-            )}
-
-            {decisionState === "empty" && (
-              <p className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
-                의사결정 브리프 데이터가 아직 준비되지 않았습니다.
-              </p>
-            )}
-
-            {decisionState === "ready" && (
-              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-                {decisionCards.map((card) => (
-                  <DecisionCardView key={`decision-${card.ticker}`} card={card} />
-                ))}
-              </div>
-            )}
-          </section>
         </>
       )}
 
       <aside className="mt-8 rounded-2xl border border-slate-200 bg-white p-5">
         <h3 className="text-sm font-semibold text-slate-900">다음 단계</h3>
-        <p className="mt-1 text-sm text-slate-600">맞춤 ETF 비중 추천이 필요하면 설문을 진행해 주세요.</p>
+        <p className="mt-1 text-sm text-slate-600">티커 단위로 더 깊게 보고 싶으시면 전용 브리프 페이지를 이용해 주세요.</p>
         <div className="mt-3 flex flex-wrap items-center gap-4">
-          <Link href="/survey" className="inline-flex text-sm font-semibold text-blue-700 hover:text-blue-800">
-            설문 시작하기 →
-          </Link>
-          <Link href="/decision-brief" className="inline-flex text-sm font-semibold text-slate-700 hover:text-slate-900">
+          <Link href="/decision-brief" className="inline-flex text-sm font-semibold text-blue-700 hover:text-blue-800">
             ETF 브리프 바로가기 →
+          </Link>
+          <Link href="/survey" className="inline-flex text-sm font-semibold text-slate-700 hover:text-slate-900">
+            설문 시작하기 →
           </Link>
         </div>
       </aside>
