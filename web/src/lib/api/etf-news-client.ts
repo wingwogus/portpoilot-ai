@@ -12,6 +12,7 @@ export type EtfNewsCard = {
   signal: SignalTone;
   summary: string;
   updatedAt?: string;
+  sectors: string[];
   news: NewsLink[];
 };
 
@@ -37,6 +38,11 @@ function asNewsLink(input: unknown): NewsLink | null {
     url,
     source: row.source ? String(row.source) : undefined,
   };
+}
+
+function asStringList(input: unknown): string[] {
+  if (!Array.isArray(input)) return [];
+  return input.map((x) => String(x).trim()).filter(Boolean);
 }
 
 function asCard(input: unknown): EtfNewsCard | null {
@@ -65,6 +71,7 @@ function asCard(input: unknown): EtfNewsCard | null {
     signal: parseSignal(row.signal ?? row.badge ?? row.sentiment),
     summary: String(row.summary ?? row.commentary ?? "요약 정보가 없습니다."),
     updatedAt: row.updated_at ? String(row.updated_at) : row.updatedAt ? String(row.updatedAt) : undefined,
+    sectors: asStringList(row.sector_tags ?? row.sectors),
     news,
   };
 }
@@ -103,7 +110,7 @@ export async function fetchEtfNews(
 ): Promise<EtfNewsCard[]> {
   const params = new URLSearchParams({
     tickers: tickers.join(","),
-    limit: "8",
+    limit: "12",
     prefer_recent_hours: "96",
   });
 

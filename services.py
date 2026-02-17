@@ -53,8 +53,33 @@ ETF_NEWS_RAG = ETFNewsRAGService(
 )
 ETF_NEWS_INDEX_STATUS: Dict[str, Any] = {}
 
-ETF_DECISION_RAW_DIR = os.getenv("ETF_DECISION_RAW_DIR", "/home/node/.openclaw/workspace/research-data/raw")
-ETF_DECISION_BRIEF_DIR = os.getenv("ETF_DECISION_BRIEF_DIR", "/home/node/.openclaw/workspace/research-data/brief")
+def _resolve_existing_path(candidates: list[str], fallback: str) -> str:
+    for path in candidates:
+        if path and os.path.exists(path):
+            return path
+    return fallback
+
+
+ETF_DECISION_RAW_DIR = os.getenv(
+    "ETF_DECISION_RAW_DIR",
+    _resolve_existing_path(
+        [
+            "/home/node/.openclaw/workspace/research-data/raw",
+            os.path.join("data", "research-data", "raw"),
+        ],
+        "/home/node/.openclaw/workspace/research-data/raw",
+    ),
+)
+ETF_DECISION_BRIEF_DIR = os.getenv(
+    "ETF_DECISION_BRIEF_DIR",
+    _resolve_existing_path(
+        [
+            "/home/node/.openclaw/workspace/research-data/brief",
+            os.path.join("data", "research-data", "brief"),
+        ],
+        "/home/node/.openclaw/workspace/research-data/brief",
+    ),
+)
 ETF_DECISION_RAG = ETFDecisionRAGService(
     raw_dir=ETF_DECISION_RAW_DIR,
     brief_dir=ETF_DECISION_BRIEF_DIR,
