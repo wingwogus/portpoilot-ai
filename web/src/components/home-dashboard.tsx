@@ -149,8 +149,11 @@ export function HomeDashboard() {
 
       {state === "ready" && (
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 xl:grid-cols-3">
-          {cards.map((card) => (
-            <EtfCard key={card.ticker} card={card} />
+          {cards.map((card, idx) => (
+            <EtfCard
+              key={`${card.ticker}-${card.updatedAt ?? "na"}-${card.news[0]?.url ?? idx}`}
+              card={card}
+            />
           ))}
         </div>
       )}
