@@ -23,6 +23,7 @@ from models import (
     ETFNewsIndexStatusResponse,
     ETFDecisionBriefResponse,
     ETFDecisionIndexStatusResponse,
+    HomeFeedResponse,
 )
 from services import (
     publish_daily_report,
@@ -37,6 +38,7 @@ from services import (
     get_etf_news_index_status,
     get_etf_decision_brief,
     get_etf_decision_index_status,
+    get_home_feed,
 )
 
 
@@ -200,6 +202,14 @@ async def get_etf_news(tickers: str, limit: int = 8, prefer_recent_hours: int = 
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"ETF 뉴스 검색 실패: {e}")
+
+
+@app.get("/home-feed", response_model=HomeFeedResponse, tags=["home-feed"])
+async def home_feed():
+    try:
+        return get_home_feed()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"홈 피드 조회 실패: {e}")
 
 
 @app.get("/etf-news/index-status", response_model=ETFNewsIndexStatusResponse, tags=["etf-news"])

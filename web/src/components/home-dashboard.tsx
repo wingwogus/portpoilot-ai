@@ -3,22 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { type DecisionCard } from "@/lib/api/etf-decision-client";
+import { fetchHomeFeed, type HomeFeedSectorCard } from "@/lib/api/home-feed-client";
 import { type EtfNewsCard, fetchEtfNews } from "@/lib/api/etf-news-client";
 
 type ViewState = "loading" | "ready" | "empty" | "error";
 
-type SectorHotNews = {
-  title: string;
-  url: string;
-  source?: string;
-  ticker: string;
-};
-
-type SectorCard = {
-  sector: string;
-  etfCount: number;
-  hotNews: SectorHotNews[];
-};
+type SectorCard = HomeFeedSectorCard;
 
 const DEFAULT_TICKERS = ["QQQ", "SPY", "SOXX", "SMH", "VTI", "TLT"];
 
@@ -75,14 +65,14 @@ function normalizeToAtLeastSix(cards: EtfNewsCard[]): EtfNewsCard[] {
 }
 
 function buildSectorCards(cards: EtfNewsCard[]): SectorCard[] {
-  const sectorMap = new Map<string, { etfs: Set<string>; hot: Map<string, SectorHotNews> }>();
+  const sectorMap = new Map<string, { etfs: Set<string>; hot: Map<string, { title: string; url: string; source?: string; ticker: string }> }>();
 
   for (const card of cards) {
     const sectors = card.sectors.length > 0 ? card.sectors : ["기타"];
 
     for (const sector of sectors) {
       if (!sectorMap.has(sector)) {
-        sectorMap.set(sector, { etfs: new Set<string>(), hot: new Map<string, SectorHotNews>() });
+        sectorMap.set(sector, { etfs: new Set<string>(), hot: new Map<string, { title: string; url: string; source?: string; ticker: string }>() });
       }
 
       const bucket = sectorMap.get(sector)!;
@@ -194,6 +184,7 @@ function EtfNewsCardView({ card }: { card: EtfNewsCard }) {
 export function HomeDashboard() {
   const [newsState, setNewsState] = useState<ViewState>("loading");
   const [cards, setCards] = useState<EtfNewsCard[]>([]);
+  const [sectorCardsState, setSectorCardsState] = useState<SectorCard[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const refresh = async () => {
@@ -201,9 +192,21 @@ export function HomeDashboard() {
     setErrorMessage(null);
 
     try {
+      const homeFeed = await fetchHomeFeed();
+      const normalized = normalizeToAtLeastSix(homeFeed.etfCards);
+      setCards(normalized);
+      setSectorCardsState(homeFeed.sectorCards.length > 0 ? homeFeed.sectorCards : buildSectorCards(normalized));
+      setNewsState(normalized.length > 0 ? "ready" : "empty");
+      return;
+    } catch {
+      // /home-feed 실패 시 기존 /etf-news로 폴백
+    }
+
+    try {
       const newsResult = await fetchEtfNews(DEFAULT_TICKERS);
       const normalized = normalizeToAtLeastSix(newsResult);
       setCards(normalized);
+      setSectorCardsState(buildSectorCards(normalized));
       setNewsState(normalized.length > 0 ? "ready" : "empty");
     } catch (error) {
       setNewsState("error");
@@ -216,7 +219,7 @@ export function HomeDashboard() {
   }, []);
 
   const updatedCount = useMemo(() => cards.filter((card) => card.updatedAt).length, [cards]);
-  const sectorCards = useMemo(() => buildSectorCards(cards), [cards]);
+  const sectorCards = useMemo(() => (sectorCardsState.length > 0 ? sectorCardsState : buildSectorCards(cards)), [cards, sectorCardsState]);
 
   return (
     <section aria-labelledby="etf-dashboard-title" className="mt-8">

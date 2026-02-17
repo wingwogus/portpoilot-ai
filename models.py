@@ -249,3 +249,33 @@ class ETFDecisionIndexStatusResponse(BaseModel):
     latest_loaded: Dict[str, bool]
     built_at: Optional[str] = None
     error: Optional[str] = None
+
+
+# --- Home Feed API ---
+class HomeFeedNewsItem(BaseModel):
+    title: str
+    url: str
+    source: Optional[str] = None
+    ticker: Optional[str] = None
+
+
+class HomeFeedSectorCard(BaseModel):
+    sector: str
+    etf_count: int = Field(..., ge=0)
+    hot_news: List[HomeFeedNewsItem] = Field(default_factory=list)
+
+
+class HomeFeedEtfCard(BaseModel):
+    ticker: str
+    summary: str
+    signal: Literal["bullish", "neutral", "bearish"]
+    updated_at: Optional[str] = None
+    sectors: List[str] = Field(default_factory=list)
+    news: List[HomeFeedNewsItem] = Field(default_factory=list)
+
+
+class HomeFeedResponse(BaseModel):
+    generated_at: str
+    locale: Literal["ko-KR"] = "ko-KR"
+    sector_cards: List[HomeFeedSectorCard] = Field(default_factory=list)
+    etf_cards: List[HomeFeedEtfCard] = Field(default_factory=list, min_length=6)

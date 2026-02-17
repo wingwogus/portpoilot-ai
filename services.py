@@ -4,7 +4,8 @@ import datetime
 import asyncio
 import hashlib
 from copy import deepcopy
-from typing import Dict, Any, Optional
+from pathlib import Path
+from typing import Dict, Any, Optional, List
 
 from models import (
     MarketBriefingResponse,
@@ -52,6 +53,14 @@ ETF_NEWS_RAG = ETFNewsRAGService(
     provider=_news_provider,
 )
 ETF_NEWS_INDEX_STATUS: Dict[str, Any] = {}
+HOME_FEED_SCHEMA_PATH = os.getenv("HOME_FEED_SCHEMA_PATH", os.path.join("data", "fundmanage-home-feed.schema.json"))
+HOME_FEED_SOURCE_CANDIDATES = [
+    os.getenv("HOME_FEED_SOURCE_PATH", os.path.join("data", "research-data", "brief", "home_feed_latest.json")),
+    os.path.join("data", "home-feed", "latest.json"),
+]
+HOME_FEED_SAVE_PATH = os.getenv("HOME_FEED_SAVE_PATH", os.path.join("data", "home-feed", "latest.json"))
+HOME_FEED_DATA: Dict[str, Any] = {}
+HOME_FEED_STATUS: Dict[str, Any] = {}
 
 def _resolve_existing_path(candidates: list[str], fallback: str) -> str:
     for path in candidates:
@@ -312,6 +321,186 @@ def _mock_portfolio(request) -> Dict[str, Any]:
     }
 
 
+def _validate_home_feed_minimum(payload: Dict[str, Any]) -> tuple[bool, str]:
+    if not isinstance(payload, dict):
+        return False, "payload must be object"
+
+    schema_required = ["generated_at", "locale", "sector_cards", "etf_cards"]
+    etf_min_items = 6
+    try:
+        if os.path.exists(HOME_FEED_SCHEMA_PATH):
+            with open(HOME_FEED_SCHEMA_PATH, "r", encoding="utf-8") as f:
+                schema = json.load(f)
+            schema_required = schema.get("required", schema_required)
+            etf_min_items = int(
+                schema.get("properties", {}).get("etf_cards", {}).get("minItems", etf_min_items)
+            )
+    except Exception:
+        pass
+
+    for key in schema_required:
+        if key not in payload:
+            return False, f"missing required field: {key}"
+
+    if payload.get("locale") != "ko-KR":
+        return False, "locale must be ko-KR"
+
+    etf_cards = payload.get("etf_cards")
+    if not isinstance(etf_cards, list) or len(etf_cards) < etf_min_items:
+        return False, f"etf_cards must be array with at least {etf_min_items} items"
+
+    sector_cards = payload.get("sector_cards")
+    if not isinstance(sector_cards, list):
+        return False, "sector_cards must be array"
+
+    for idx, item in enumerate(etf_cards):
+        if not isinstance(item, dict):
+            return False, f"etf_cards[{idx}] must be object"
+        for field in ["ticker", "summary", "signal", "news"]:
+            if field not in item:
+                return False, f"etf_cards[{idx}] missing {field}"
+        if item.get("signal") not in {"bullish", "neutral", "bearish"}:
+            return False, f"etf_cards[{idx}].signal invalid"
+        if not isinstance(item.get("news"), list):
+            return False, f"etf_cards[{idx}].news must be array"
+
+    for idx, item in enumerate(sector_cards):
+        if not isinstance(item, dict):
+            return False, f"sector_cards[{idx}] must be object"
+        for field in ["sector", "etf_count", "hot_news"]:
+            if field not in item:
+                return False, f"sector_cards[{idx}] missing {field}"
+
+    return True, "ok"
+
+
+def _build_home_feed_from_etf_news() -> Dict[str, Any]:
+    default_tickers = ["QQQ", "SPY", "SOXX", "SMH", "VTI", "TLT"]
+    etf_news = search_etf_news(tickers=",".join(default_tickers), limit=24, prefer_recent_hours=96)
+    items = etf_news.get("items", [])
+
+    grouped: Dict[str, Dict[str, Any]] = {}
+    for row in items:
+        for ticker in row.get("ticker_hits", []) or []:
+            key = ticker.upper()
+            grouped.setdefault(key, {"rows": [], "sectors": set()})
+            grouped[key]["rows"].append(row)
+            for sector in row.get("sector_tags", []) or []:
+                grouped[key]["sectors"].add(str(sector))
+
+    for ticker in default_tickers:
+        grouped.setdefault(ticker, {"rows": [], "sectors": set()})
+
+    etf_cards: List[Dict[str, Any]] = []
+    for ticker, bucket in grouped.items():
+        rows = bucket["rows"]
+        top = rows[0] if rows else {}
+        news = [
+            {
+                "title": str(r.get("title", "")),
+                "url": str(r.get("source_link", "")),
+                "source": "ETF News",
+            }
+            for r in rows[:3]
+            if r.get("title") and r.get("source_link")
+        ]
+        if not news:
+            news = [{"title": f"{ticker} 관련 데이터 수집 중", "url": "https://news.example.kr/pending", "source": "PortPilot"}]
+
+        etf_cards.append(
+            {
+                "ticker": ticker,
+                "summary": str(top.get("summary") or "관련 뉴스 데이터 수집 중입니다."),
+                "signal": str(top.get("signal") or "neutral"),
+                "updated_at": str(top.get("published_at") or _now_iso()),
+                "sectors": sorted(bucket["sectors"]),
+                "news": news,
+            }
+        )
+
+    etf_cards.sort(key=lambda x: (x["ticker"] not in default_tickers, x["ticker"]))
+    etf_cards = etf_cards[: max(6, len(etf_cards))]
+
+    sector_map: Dict[str, Dict[str, Any]] = {}
+    for card in etf_cards:
+        sectors = card.get("sectors") or ["기타"]
+        for sector in sectors:
+            sector_map.setdefault(sector, {"etfs": set(), "hot_news": []})
+            sector_map[sector]["etfs"].add(card["ticker"])
+            for n in card.get("news", [])[:2]:
+                sector_map[sector]["hot_news"].append({
+                    "title": n.get("title", ""),
+                    "url": n.get("url", ""),
+                    "source": n.get("source"),
+                    "ticker": card["ticker"],
+                })
+
+    sector_cards = []
+    for sector, row in sector_map.items():
+        dedup = {}
+        for n in row["hot_news"]:
+            if n.get("url") and n["url"] not in dedup:
+                dedup[n["url"]] = n
+        sector_cards.append(
+            {
+                "sector": sector,
+                "etf_count": len(row["etfs"]),
+                "hot_news": list(dedup.values())[:3],
+            }
+        )
+
+    sector_cards.sort(key=lambda x: x["etf_count"], reverse=True)
+
+    return {
+        "generated_at": _now_iso(),
+        "locale": "ko-KR",
+        "sector_cards": sector_cards[:6],
+        "etf_cards": etf_cards,
+    }
+
+
+def _save_home_feed(payload: Dict[str, Any], output_path: str = HOME_FEED_SAVE_PATH) -> None:
+    target = Path(output_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with target.open("w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2)
+
+
+def sync_home_feed_data() -> Dict[str, Any]:
+    global HOME_FEED_DATA, HOME_FEED_STATUS
+
+    candidate_payload = None
+    candidate_path = None
+    for path in HOME_FEED_SOURCE_CANDIDATES:
+        if not path or not os.path.exists(path):
+            continue
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                loaded = json.load(f)
+            if isinstance(loaded, dict) and "home_feed" in loaded and isinstance(loaded["home_feed"], dict):
+                loaded = loaded["home_feed"]
+            candidate_payload = loaded
+            candidate_path = path
+            break
+        except Exception:
+            continue
+
+    is_valid = False
+    reason = "source_not_found"
+    if candidate_payload is not None:
+        is_valid, reason = _validate_home_feed_minimum(candidate_payload)
+
+    if is_valid:
+        HOME_FEED_DATA = candidate_payload
+        HOME_FEED_STATUS = {"source": candidate_path, "valid": True, "fallback": False}
+    else:
+        HOME_FEED_DATA = _build_home_feed_from_etf_news()
+        HOME_FEED_STATUS = {"source": candidate_path, "valid": False, "fallback": True, "reason": reason}
+
+    _save_home_feed(HOME_FEED_DATA)
+    return HOME_FEED_DATA
+
+
 async def fetch_news_sequentially():
     news_data = {}
     try:
@@ -434,6 +623,11 @@ async def publish_daily_report():
             "archives_by_date": {},
             "latest_loaded": {"raw": False, "brief": False},
         }
+
+    try:
+        sync_home_feed_data()
+    except Exception as e:
+        HOME_FEED_STATUS.update({"fallback": True, "error": str(e)})
 
 
 def get_briefing_data():
@@ -695,3 +889,9 @@ def get_etf_decision_index_status() -> Dict[str, Any]:
             "error": ETF_DECISION_INDEX_STATUS.get("error"),
         })
     return status
+
+
+def get_home_feed() -> Dict[str, Any]:
+    if HOME_FEED_DATA:
+        return HOME_FEED_DATA
+    return sync_home_feed_data()

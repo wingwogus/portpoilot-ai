@@ -1,0 +1,323 @@
+{
+  "generated_at": "2026-02-17T15:59:15Z",
+  "locale": "ko-KR",
+  "sector_cards": [
+    {
+      "sector": "Information Technology",
+      "etf_count": 5,
+      "hot_news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "연준 인사들의 신중 발언, 채권시장 변동성 완화",
+          "url": "https://news.example.kr/policy/fed-cautious-tone",
+          "source": "ETF News",
+          "ticker": "SPY"
+        }
+      ]
+    },
+    {
+      "sector": "Fixed Income",
+      "etf_count": 4,
+      "hot_news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "연준 인사들의 신중 발언, 채권시장 변동성 완화",
+          "url": "https://news.example.kr/policy/fed-cautious-tone",
+          "source": "ETF News",
+          "ticker": "SPY"
+        }
+      ]
+    },
+    {
+      "sector": "Semiconductors",
+      "etf_count": 3,
+      "hot_news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        }
+      ]
+    },
+    {
+      "sector": "Utilities",
+      "etf_count": 3,
+      "hot_news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        }
+      ]
+    },
+    {
+      "sector": "Broad Market",
+      "etf_count": 3,
+      "hot_news": [
+        {
+          "title": "연준 인사들의 신중 발언, 채권시장 변동성 완화",
+          "url": "https://news.example.kr/policy/fed-cautious-tone",
+          "source": "ETF News",
+          "ticker": "SPY"
+        },
+        {
+          "title": "미 10년물 금리 안정세로 성장주 밸류에이션 부담 완화",
+          "url": "https://news.example.kr/macro/us-yield-stable",
+          "source": "ETF News",
+          "ticker": "SPY"
+        },
+        {
+          "title": "미국 제조업 지표 개선, 경기 침체 우려 일부 완화",
+          "url": "https://news.example.kr/macro/us-manufacturing-improves",
+          "source": "ETF News",
+          "ticker": "VTI"
+        }
+      ]
+    },
+    {
+      "sector": "Communication Services",
+      "etf_count": 2,
+      "hot_news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News",
+          "ticker": "QQQ"
+        },
+        {
+          "title": "연준 인사들의 신중 발언, 채권시장 변동성 완화",
+          "url": "https://news.example.kr/policy/fed-cautious-tone",
+          "source": "ETF News",
+          "ticker": "SPY"
+        }
+      ]
+    }
+  ],
+  "etf_cards": [
+    {
+      "ticker": "QQQ",
+      "summary": "글로벌 클라우드 사업자의 AI 서버 투자 계획이 유지되며 반도체 장비와 메모리 밸류체인 실적 기대가 이어졌다. 업황 선행지표도 개선 흐름을 보였다.",
+      "signal": "neutral",
+      "updated_at": "2026-02-16T23:45:00Z",
+      "sectors": [
+        "Communication Services",
+        "Fixed Income",
+        "Information Technology",
+        "Semiconductors",
+        "Utilities"
+      ],
+      "news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News"
+        },
+        {
+          "title": "미국 반도체 수출 회복 기대에 기술주 투자심리 개선",
+          "url": "https://news.example.kr/markets/semiconductor-rebound",
+          "source": "ETF News"
+        }
+      ]
+    },
+    {
+      "ticker": "SMH",
+      "summary": "글로벌 클라우드 사업자의 AI 서버 투자 계획이 유지되며 반도체 장비와 메모리 밸류체인 실적 기대가 이어졌다. 업황 선행지표도 개선 흐름을 보였다.",
+      "signal": "neutral",
+      "updated_at": "2026-02-16T23:45:00Z",
+      "sectors": [
+        "Information Technology",
+        "Semiconductors",
+        "Utilities"
+      ],
+      "news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News"
+        },
+        {
+          "title": "미국 반도체 수출 회복 기대에 기술주 투자심리 개선",
+          "url": "https://news.example.kr/markets/semiconductor-rebound",
+          "source": "ETF News"
+        }
+      ]
+    },
+    {
+      "ticker": "SOXX",
+      "summary": "글로벌 클라우드 사업자의 AI 서버 투자 계획이 유지되며 반도체 장비와 메모리 밸류체인 실적 기대가 이어졌다. 업황 선행지표도 개선 흐름을 보였다.",
+      "signal": "neutral",
+      "updated_at": "2026-02-16T23:45:00Z",
+      "sectors": [
+        "Information Technology",
+        "Semiconductors",
+        "Utilities"
+      ],
+      "news": [
+        {
+          "title": "AI 서버 수요 견조, 반도체 장비주 실적 기대 유지",
+          "url": "https://news.example.kr/tech/ai-server-demand",
+          "source": "ETF News"
+        },
+        {
+          "title": "전력 인프라 투자 확대 기대, 반도체 전방 수요 개선",
+          "url": "https://news.example.kr/tech/power-infra-demand",
+          "source": "ETF News"
+        },
+        {
+          "title": "미국 반도체 수출 회복 기대에 기술주 투자심리 개선",
+          "url": "https://news.example.kr/markets/semiconductor-rebound",
+          "source": "ETF News"
+        }
+      ]
+    },
+    {
+      "ticker": "SPY",
+      "summary": "연준 인사들이 물가와 고용 흐름을 확인하며 신중하게 접근하겠다고 밝히자 채권시장의 변동성이 다소 진정됐다. 장기채 ETF는 낙폭을 일부 회복했다.",
+      "signal": "neutral",
+      "updated_at": "2026-02-16T22:20:00Z",
+      "sectors": [
+        "Broad Market",
+        "Communication Services",
+        "Consumer Discretionary",
+        "Defensive",
+        "Energy",
+        "Fixed Income",
+        "Industrials",
+        "Information Technology",
+        "Large Cap",
+        "Market Strategy",
+        "Policy"
+      ],
+      "news": [
+        {
+          "title": "연준 인사들의 신중 발언, 채권시장 변동성 완화",
+          "url": "https://news.example.kr/policy/fed-cautious-tone",
+          "source": "ETF News"
+        },
+        {
+          "title": "미 10년물 금리 안정세로 성장주 밸류에이션 부담 완화",
+          "url": "https://news.example.kr/macro/us-yield-stable",
+          "source": "ETF News"
+        },
+        {
+          "title": "미국 제조업 지표 개선, 경기 침체 우려 일부 완화",
+          "url": "https://news.example.kr/macro/us-manufacturing-improves",
+          "source": "ETF News"
+        }
+      ]
+    },
+    {
+      "ticker": "TLT",
+      "summary": "연준 인사들이 물가와 고용 흐름을 확인하며 신중하게 접근하겠다고 밝히자 채권시장의 변동성이 다소 진정됐다. 장기채 ETF는 낙폭을 일부 회복했다.",
+      "signal": "neutral",
+      "updated_at": "2026-02-16T22:20:00Z",
+      "sectors": [
+        "Broad Market",
+        "Fixed Income",
+        "Information Technology",
+        "Policy"
+      ],
+      "news": [
+        {
+          "title": "연준 인사들의 신중 발언, 채권시장 변동성 완화",
+          "url": "https://news.example.kr/policy/fed-cautious-tone",
+          "source": "ETF News"
+        },
+        {
+          "title": "미 10년물 금리 안정세로 성장주 밸류에이션 부담 완화",
+          "url": "https://news.example.kr/macro/us-yield-stable",
+          "source": "ETF News"
+        },
+        {
+          "title": "리스크 자산 혼조, 포트폴리오 분산 필요성 재확인",
+          "url": "https://news.example.kr/strategy/diversification-check",
+          "source": "ETF News"
+        }
+      ]
+    },
+    {
+      "ticker": "VTI",
+      "summary": "제조업 신규주문 지표가 예상보다 양호하게 나오면서 경기 침체 우려가 일부 완화됐다. 광범위 시장 ETF와 산업재 관련 종목이 동반 반등했다.",
+      "signal": "neutral",
+      "updated_at": "2026-02-16T20:05:00Z",
+      "sectors": [
+        "Broad Market",
+        "Consumer Discretionary",
+        "Defensive",
+        "Fixed Income",
+        "Industrials",
+        "Large Cap",
+        "Market Strategy"
+      ],
+      "news": [
+        {
+          "title": "미국 제조업 지표 개선, 경기 침체 우려 일부 완화",
+          "url": "https://news.example.kr/macro/us-manufacturing-improves",
+          "source": "ETF News"
+        },
+        {
+          "title": "배당주 선호 확대, 변동성 국면에서 방어형 자금 유입",
+          "url": "https://news.example.kr/strategy/dividend-defensive-flow",
+          "source": "ETF News"
+        },
+        {
+          "title": "리스크 자산 혼조, 포트폴리오 분산 필요성 재확인",
+          "url": "https://news.example.kr/strategy/diversification-check",
+          "source": "ETF News"
+        }
+      ]
+    }
+  ]
+}
