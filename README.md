@@ -1,8 +1,14 @@
 # PortPilot AI - FastAPI (ETF Recommendation + ETF 뉴스 RAG)
 
 사용자 성향 기반 ETF 추천 API(`/generate-portfolio`)와
-내장 VectorDB 기반 ETF 뉴스 RAG API(`/etf-news`)를 제공하는 백엔드입니다.
+내장 VectorDB 기반 ETF 뉴스 RAG API(`/etf-news`)와
+사건/인과 기반 ETF 의사결정 RAG API(`/etf-decision-brief`)를 제공하는 백엔드입니다.
 기존 `/market-briefing`, `/api/v1/checkups`는 유지됩니다.
+
+프론트엔드(`web/`)는 아래를 포함한 ETF RAG MVP 화면을 제공합니다.
+- 홈 대시보드(`/`): `/etf-news`, `/etf-decision-brief` 요약 카드
+- 의사결정 브리프 전용(`/decision-brief`): 티커 직접 입력 조회
+- 설문/포트폴리오(`/survey`, `/portfolio-result`): `/generate-portfolio` 연동
 
 ---
 
@@ -55,6 +61,10 @@ export ETF_NEWS_PROVIDER=json_file
 
 # rss provider 사용 시 피드 URL 목록(콤마 구분)
 export ETF_NEWS_RSS_URLS="https://feeds.reuters.com/reuters/businessNews,https://feeds.reuters.com/news/wealth"
+
+# ETF 의사결정 RAG 입력 데이터 경로
+export ETF_DECISION_RAW_DIR=/home/node/.openclaw/workspace/research-data/raw
+export ETF_DECISION_BRIEF_DIR=/home/node/.openclaw/workspace/research-data/brief
 ```
 
 > `ETF_NEWS_PROVIDER=rss` 사용 시 RSS 인덱싱 실패가 나면 자동으로 `json_file`로 폴백하며,
@@ -160,10 +170,27 @@ export ETF_NEWS_RSS_URLS="https://feeds.reuters.com/reuters/businessNews,https:/
 }
 ```
 
-## 4) 부가 기능: `GET /market-briefing`
+## 4) ETF 의사결정 브리프: `GET /etf-decision-brief?tickers=QQQ,SPY,XLE,SMH`
+
+쿼리 파라미터:
+- `tickers` (필수): 쉼표 구분 ETF 티커
+- `limit_per_ticker` (선택, 기본 5, 최대 10)
+
+응답 특징:
+- 티커별 `bullish/neutral/bearish` 신호
+- `conclusion`, `causal_summary`, `key_events`, `evidence`, `risk_invalidation_conditions`
+- 증거(evidence)에 `source_link` 포함 (출처 보존)
+
+## 5) ETF 의사결정 인덱스 상태: `GET /etf-decision-brief/index-status`
+
+응답 특징:
+- `archives_by_date`: 날짜별 인덱싱 문서 수
+- `latest_loaded`: raw/brief의 latest 동시 처리 여부
+
+## 6) 부가 기능: `GET /market-briefing`
 - 기존 endpoint 유지
 
-## 5) Reason MVP: `/api/v1/*`
+## 7) Reason MVP: `/api/v1/*`
 - 기존 체크업 관련 endpoint 유지
 
 ---

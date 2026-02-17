@@ -85,6 +85,19 @@ function normalize(payload: unknown): EtfNewsCard[] {
   return [];
 }
 
+async function readErrorMessage(response: Response): Promise<string> {
+  try {
+    const data = (await response.json()) as UnknownRecord;
+    const detail = data.error ?? data.message ?? data.detail;
+    if (typeof detail === "string" && detail.trim()) return detail;
+  } catch {
+    // fallback to text
+  }
+
+  const text = await response.text();
+  return text || "응답 본문 없음";
+}
+
 export async function fetchEtfNews(
   tickers: string[] = ["QQQ", "SPY", "SOXX", "SMH", "VTI", "TLT"],
 ): Promise<EtfNewsCard[]> {
@@ -101,8 +114,8 @@ export async function fetchEtfNews(
   });
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`ETF 뉴스 조회 실패 (${response.status}): ${text}`);
+    const message = await readErrorMessage(response);
+    throw new Error(`ETF 뉴스 조회 실패 (${response.status}): ${message}`);
   }
 
   const data = (await response.json()) as unknown;
