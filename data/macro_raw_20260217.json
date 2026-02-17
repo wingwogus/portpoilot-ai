@@ -1,0 +1,242 @@
+{
+  "workflow": "macro_test_once",
+  "generated_at": "2026-02-17T00:42:44Z",
+  "collector": "fallback-manual (thread-trend-scout unavailable in this runtime)",
+  "scope": "global macro/market news sources",
+  "sources_collected": 3,
+  "sources": [
+    {
+      "source": "marketwatch_top",
+      "url": "https://feeds.marketwatch.com/marketwatch/topstories/",
+      "fetched_at": "2026-02-17T00:42:44Z",
+      "item_count": 10,
+      "items": [
+        {
+          "title": "U.S. stock futures inch higher as investors digest ongoing tech selloff",
+          "url": "https://www.marketwatch.com/story/u-s-stock-futures-flat-as-investors-digest-ongoing-tech-selloff-over-holiday-weekend-765f3c5c?mod=mw_rss_topstories",
+          "published_at": "2026-02-17T00:18:00+00:00",
+          "summary": "U.S. stock futures were little changed late Monday, following another brutal week for tech stocks."
+        },
+        {
+          "title": "‘I’m close to retiring’: I’m behind on my property tax. Is this a really bad time to sell my house?",
+          "url": "https://www.marketwatch.com/story/im-close-to-retiring-im-behind-on-my-property-taxes-is-this-a-bad-time-to-sell-my-house-40954efd?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T23:00:00+00:00",
+          "summary": "“I’ve never been late on a mortgage, so this makes me nervous.”"
+        },
+        {
+          "title": "Buying stocks everyone admires is a recipe for underperformance — but Apple breaks the rule",
+          "url": "https://www.marketwatch.com/story/buying-stocks-everyone-admires-is-a-recipe-for-underperformance-but-apple-breaks-the-rule-26de6e2f?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T22:57:00+00:00",
+          "summary": "Unloved companies with rock-bottom expectations are the real engines of your portfolio."
+        },
+        {
+          "title": "‘Am I crazy?’ My boyfriend’s parents say he doesn’t earn enough to marry me. Who is to blame here?",
+          "url": "https://www.marketwatch.com/story/weve-been-dating-for-5-years-my-boyfriends-parents-say-he-doesnt-earn-enough-to-marry-should-i-speak-to-his-father-44b48700?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T22:49:00+00:00",
+          "summary": "The Moneyist: “I have a Valentine’s message for you, but you won’t read it in a Hallmark card.”"
+        },
+        {
+          "title": "‘It’s a life-changing sum’: Can I stop my kids from using their inheritance to support political causes I vehemently oppose?",
+          "url": "https://www.marketwatch.com/story/its-a-life-changing-sum-can-i-stop-my-kids-from-using-their-inheritance-to-support-political-causes-i-vehemently-oppose-90809fd7?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T22:28:00+00:00",
+          "summary": "”I would hate for our money to end up in the hands of organizations that oppose everything we have supported throughout our lives.”"
+        },
+        {
+          "title": "‘I’m a loner’: I’m 62 with a multimillion-dollar portfolio and no heirs. Should I find a wife for my twilight years?",
+          "url": "https://www.marketwatch.com/story/im-a-loner-im-62-with-a-multimillion-dollar-portfolio-and-no-heirs-should-i-find-a-wife-for-my-twilight-years-4f4f4408?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T16:45:00+00:00",
+          "summary": "“I have never been married, have no siblings, and both my parents have passed away.”"
+        },
+        {
+          "title": "‘I feel the clock ticking’: My wife and I are in our 60s — and employ 48 people in a small town. Can we ever retire?",
+          "url": "https://www.marketwatch.com/story/i-feel-the-clock-ticking-my-wife-and-i-are-in-our-60s-and-employ-48-people-in-a-small-town-can-we-ever-retire-2399ba41?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T16:07:00+00:00",
+          "summary": "“We could survive financially, but my people would not.”"
+        },
+        {
+          "title": "Shipping industry set to consolidate as Hapag-Lloyd to buy Israeli firm for 58% premium",
+          "url": "https://www.marketwatch.com/story/shipping-industry-set-to-consolidate-as-hapag-lloyd-to-buy-israeli-firm-for-58-premium-35839cf0?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T15:02:00+00:00",
+          "summary": "Shipping giant Hapag-Lloyd agreed to buy Israel’s ZIM Integrated Shipping Services for $4.2 billion."
+        },
+        {
+          "title": "These might be the winners from the latest round of Chinese new year AI launches",
+          "url": "https://www.marketwatch.com/story/these-might-be-the-winners-from-the-latest-round-of-chinese-new-year-ai-launches-06779445?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T14:27:00+00:00",
+          "summary": "The holiday period is crucial for the launch of new products and Chinese AI plays are trying to prove they are as good as, or close enough to, global frontier models from OpenAI and Google."
+        },
+        {
+          "title": "Hegseth reportedly considering severe penalty on Anthropic as negotiations stall",
+          "url": "https://www.marketwatch.com/story/hegseth-reportedly-considering-severe-penalty-on-anthropic-as-negotiations-stall-16dae92f?mod=mw_rss_topstories",
+          "published_at": "2026-02-16T13:58:00+00:00",
+          "summary": "Defense Sec. Pete Hegseth reportedly is close to putting Claude maker Anthropic on a “supply chain risk” list that would be a devastating blow to its finances."
+        }
+      ]
+    },
+    {
+      "source": "ft_home",
+      "url": "https://www.ft.com/rss/home/uk",
+      "fetched_at": "2026-02-17T00:42:44Z",
+      "item_count": 8,
+      "items": [
+        {
+          "title": "Starmer cancels plans to delay 30 local council elections in England",
+          "url": "https://www.ft.com/content/fb82b59a-7ebb-40f2-ac88-da9dfd31dbbe",
+          "published_at": "2026-02-16T20:49:31+00:00",
+          "summary": "Latest government U-turn comes after Reform UK launched legal action over proposal"
+        },
+        {
+          "title": "Are Anthropic’s new AI work tools game-changing for professionals?",
+          "url": "https://www.ft.com/content/92dfd571-8d34-42f1-8be8-dce126998e37",
+          "published_at": "2026-02-16T04:00:00+00:00",
+          "summary": "Adaptable plug-ins must compete with bespoke products already used by lawyers and consultants"
+        },
+        {
+          "title": "Why Rubio failed to repair the transatlantic rift",
+          "url": "https://www.ft.com/content/5c6df36a-50c6-4832-8def-0aa351b17647",
+          "published_at": "2026-02-16T12:14:27+00:00",
+          "summary": "A moment of calm in relations between Europe and the US is a prelude to crises ahead"
+        },
+        {
+          "title": "Student loans show that hard policy choices will only get harder",
+          "url": "https://www.ft.com/content/131f0e09-88ed-4597-8408-e76a50e36618",
+          "published_at": "2026-02-16T05:00:24+00:00",
+          "summary": "The debate over university funding is a good example of the intractable challenges facing the UK government"
+        },
+        {
+          "title": "EVs must be 70% made in the EU to qualify for state support, Brussels says",
+          "url": "https://www.ft.com/content/02beec7f-9c29-4743-8041-ea5685fa0ae0",
+          "published_at": "2026-02-16T20:36:11+00:00",
+          "summary": "Draft legislation on local content by European Commission seeks to protect bloc’s manufacturing industries"
+        },
+        {
+          "title": "EU privacy watchdog opens probe into X over sexualised AI images",
+          "url": "https://www.ft.com/content/3c720c9b-d2b6-41b3-a7b7-960b5f1fb94b",
+          "published_at": "2026-02-17T00:01:09+00:00",
+          "summary": "‘Large-scale’ inquiry is latest sign of how regulators are scrutinising the group’s Grok chatbot"
+        },
+        {
+          "title": "Thomas Pritzker steps down as Hyatt executive chair over Epstein ties",
+          "url": "https://www.ft.com/content/83c61aea-9e5d-482f-bf41-e4b89518c5ec",
+          "published_at": "2026-02-16T23:56:44+00:00",
+          "summary": "Billionaire says he ‘exercised terrible judgment’ for maintaining contact with sex offender"
+        },
+        {
+          "title": "BHP reports sharp rise in first-half profit amid strong demand for copper",
+          "url": "https://www.ft.com/content/40d04677-2137-465c-a7c5-4b82a3e51a83",
+          "published_at": "2026-02-16T23:34:46+00:00",
+          "summary": "World’s largest mining company says red metal accounts for more than half of core earnings"
+        }
+      ]
+    },
+    {
+      "source": "ecb_press",
+      "url": "https://www.ecb.europa.eu/rss/press.html",
+      "fetched_at": "2026-02-17T00:42:44Z",
+      "item_count": 12,
+      "items": [
+        {
+          "title": "Christine Lagarde: Preparing for geoeconomic fragmentation",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp260214~8944ba0fee.en.html",
+          "published_at": "2026-02-14T17:30:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "ECB enhances repo facility for central banks",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260214~076e09a6cc.en.html",
+          "published_at": "2026-02-14T17:30:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "ECB publishes consolidated banking data for end-September 2025",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260213~590707b254.en.html",
+          "published_at": "2026-02-13T10:00:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "Philip R. Lane: Bulgaria and the euro",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp260212_1~3173f892b1.en.html",
+          "published_at": "2026-02-12T19:25:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "ECB and ESRB issue joint report analysing financial stability risks from linkages between banks and the non-bank financial intermediation sector",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260212~fe37ff4ed0.en.html",
+          "published_at": "2026-02-12T12:00:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "Piero Cipollone: Europe and monetary sovereignty",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp260212~9fabe9baaa.en.html",
+          "published_at": "2026-02-12T10:00:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "Isabel Schnabel: Made in Europe",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp260211~2822ae9612.en.html",
+          "published_at": "2026-02-11T18:00:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "New data release: ECB wage tracker continues to suggest normalisation of negotiated wage pressures in 2026",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260211_1~dd029e0063.en.html",
+          "published_at": "2026-02-11T10:00:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "ECB appoints Thomas Broeng Jorgensen as Director General Specialised Institutions and Less Significant Institutions",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260211~ec2605cbb3.en.html",
+          "published_at": "2026-02-11T09:15:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "Luis de Guindos: Interview with Econostream Media",
+          "url": "https://www.ecb.europa.eu//press/inter/date/2026/html/ecb.in260210~b0b5032167.en.html",
+          "published_at": "2026-02-10T09:30:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "Christine Lagarde: European Parliament plenary debate on the ECB Annual Report",
+          "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp260209_1~f0653b48af.en.html",
+          "published_at": "2026-02-09T18:00:00+01:00",
+          "summary": ""
+        },
+        {
+          "title": "Statement from Christine Lagarde, President of the European Central Bank",
+          "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260209~79eb3e966e.en.html",
+          "published_at": "2026-02-09T14:25:00+01:00",
+          "summary": ""
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "source": "cnbc_top",
+      "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "source": "fed_monetary",
+      "url": "https://www.federalreserve.gov/feeds/press_monetary.xml",
+      "error": "HTTP Error 403: Forbidden"
+    },
+    {
+      "source": "boe_news",
+      "url": "https://www.bankofengland.co.uk/rss/news",
+      "error": "HTTP Error 403: Forbidden"
+    }
+  ],
+  "attempt_log": [
+    {
+      "step": "thread-trend-scout run",
+      "status": "failed",
+      "reason": "No executable/API route available in current subagent runtime."
+    },
+    {
+      "step": "fallback collector",
+      "status": "ok",
+      "reason": "Collected from public RSS sources."
+    }
+  ]
+}

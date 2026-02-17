@@ -1,0 +1,68 @@
+{
+  "workflow": "macro_test_once",
+  "generated_at": "2026-02-17T00:42:44Z",
+  "analyst": "fallback-manual (researcher unavailable in this runtime)",
+  "input_raw_file": "macro_raw_latest.json",
+  "summary_kr": [
+    "중앙은행 관련 헤드라인(ECB/Fed/BoE)이 다수로, 정책금리·유동성·금융안정 이슈가 시장 내러티브의 중심입니다.",
+    "미국 주식선물/기술주 약세 관련 기사 비중이 높아 단기적으로 리스크자산 변동성 경계가 우세합니다.",
+    "유럽(ECB)과 영국(BoE) 자료에서 지리경제 분절·금융시스템 연계 리스크가 반복 언급되어 중기 거시 리스크 요인으로 해석됩니다."
+  ],
+  "theme_scores": {
+    "monetary_policy": 9,
+    "equity_risk": 6,
+    "fx_rates": 0,
+    "geopolitics_trade": 8
+  },
+  "top_headlines": [
+    {
+      "source": "marketwatch_top",
+      "title": "U.S. stock futures inch higher as investors digest ongoing tech selloff",
+      "url": "https://www.marketwatch.com/story/u-s-stock-futures-flat-as-investors-digest-ongoing-tech-selloff-over-holiday-weekend-765f3c5c?mod=mw_rss_topstories",
+      "published_at": "2026-02-17T00:18:00+00:00"
+    },
+    {
+      "source": "marketwatch_top",
+      "title": "‘I’m close to retiring’: I’m behind on my property tax. Is this a really bad time to sell my house?",
+      "url": "https://www.marketwatch.com/story/im-close-to-retiring-im-behind-on-my-property-taxes-is-this-a-bad-time-to-sell-my-house-40954efd?mod=mw_rss_topstories",
+      "published_at": "2026-02-16T23:00:00+00:00"
+    },
+    {
+      "source": "ft_home",
+      "title": "Starmer cancels plans to delay 30 local council elections in England",
+      "url": "https://www.ft.com/content/fb82b59a-7ebb-40f2-ac88-da9dfd31dbbe",
+      "published_at": "2026-02-16T20:49:31+00:00"
+    },
+    {
+      "source": "ft_home",
+      "title": "Are Anthropic’s new AI work tools game-changing for professionals?",
+      "url": "https://www.ft.com/content/92dfd571-8d34-42f1-8be8-dce126998e37",
+      "published_at": "2026-02-16T04:00:00+00:00"
+    },
+    {
+      "source": "ecb_press",
+      "title": "Christine Lagarde: Preparing for geoeconomic fragmentation",
+      "url": "https://www.ecb.europa.eu//press/key/date/2026/html/ecb.sp260214~8944ba0fee.en.html",
+      "published_at": "2026-02-14T17:30:00+01:00"
+    },
+    {
+      "source": "ecb_press",
+      "title": "ECB enhances repo facility for central banks",
+      "url": "https://www.ecb.europa.eu//press/pr/date/2026/html/ecb.pr260214~076e09a6cc.en.html",
+      "published_at": "2026-02-14T17:30:00+01:00"
+    }
+  ],
+  "risk_bias": "neutral-to-risk-off",
+  "attempt_log": [
+    {
+      "step": "researcher run",
+      "status": "failed",
+      "reason": "No executable/API route available in current subagent runtime."
+    },
+    {
+      "step": "fallback analyst",
+      "status": "ok",
+      "reason": "Rule-based synthesis from collected raw items."
+    }
+  ]
+}
