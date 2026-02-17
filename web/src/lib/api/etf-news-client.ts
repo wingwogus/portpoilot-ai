@@ -43,13 +43,21 @@ function asCard(input: unknown): EtfNewsCard | null {
   if (!input || typeof input !== "object") return null;
   const row = input as UnknownRecord;
 
-  const ticker = String(row.ticker ?? row.symbol ?? "").toUpperCase().trim();
+  const fallbackTicker = Array.isArray(row.ticker_hits) ? String(row.ticker_hits[0] ?? "") : "";
+  const ticker = String(row.ticker ?? row.symbol ?? fallbackTicker).toUpperCase().trim();
   if (!ticker) return null;
 
+  const normalizedNews = asNewsLink({
+    title: row.title,
+    url: row.source_link,
+    source: row.source,
+  });
+
   const newsSource = (row.news ?? row.related_news ?? row.links ?? []) as unknown[];
-  const news = Array.isArray(newsSource)
+  const mappedNews = Array.isArray(newsSource)
     ? newsSource.map(asNewsLink).filter((item): item is NewsLink => item !== null).slice(0, 3)
     : [];
+  const news = mappedNews.length > 0 ? mappedNews : normalizedNews ? [normalizedNews] : [];
 
   return {
     ticker,
