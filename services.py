@@ -13,6 +13,7 @@ from models import (
     CheckupFinding,
 )
 from etf_news_rag import ETFNewsRAGService, JsonFileNewsProvider, RSSNewsProvider
+from etf_decision_rag import ETFDecisionRAGService
 
 # 포트폴리오 추천은 무조건 실연동(Ollama) 사용. Mock 응답 금지 정책.
 USE_MOCK_OLLAMA = os.getenv("USE_MOCK_OLLAMA", "false").lower() in ("1", "true", "yes", "on")
@@ -51,6 +52,14 @@ ETF_NEWS_RAG = ETFNewsRAGService(
     provider=_news_provider,
 )
 ETF_NEWS_INDEX_STATUS: Dict[str, Any] = {}
+
+ETF_DECISION_RAW_DIR = os.getenv("ETF_DECISION_RAW_DIR", "/home/node/.openclaw/workspace/research-data/raw")
+ETF_DECISION_BRIEF_DIR = os.getenv("ETF_DECISION_BRIEF_DIR", "/home/node/.openclaw/workspace/research-data/brief")
+ETF_DECISION_RAG = ETFDecisionRAGService(
+    raw_dir=ETF_DECISION_RAW_DIR,
+    brief_dir=ETF_DECISION_BRIEF_DIR,
+)
+ETF_DECISION_INDEX_STATUS: Dict[str, Any] = {}
 
 # --- In-memory stores for Reason MVP prototype ---
 CHECKUPS: Dict[str, Dict[str, Any]] = {}
@@ -380,15 +389,26 @@ async def publish_daily_report():
                     "provider_detail": "json_file(fallback_from_rss)",
                     "error": f"rss failed: {e}",
                 }
-                return
             except Exception as fallback_error:
                 ETF_NEWS_INDEX_STATUS = {
                     "error": f"rss failed: {e}; fallback failed: {fallback_error}",
                     "indexed_docs": 0,
                 }
-                return
+        else:
+            ETF_NEWS_INDEX_STATUS = {"error": str(e), "indexed_docs": 0}
 
-        ETF_NEWS_INDEX_STATUS = {"error": str(e), "indexed_docs": 0}
+    global ETF_DECISION_INDEX_STATUS
+    try:
+        ETF_DECISION_INDEX_STATUS = ETF_DECISION_RAG.build_index()
+    except Exception as e:
+        ETF_DECISION_INDEX_STATUS = {
+            "error": str(e),
+            "indexed_docs": 0,
+            "raw_dir": ETF_DECISION_RAW_DIR,
+            "brief_dir": ETF_DECISION_BRIEF_DIR,
+            "archives_by_date": {},
+            "latest_loaded": {"raw": False, "brief": False},
+        }
 
 
 def get_briefing_data():
@@ -623,5 +643,30 @@ def get_etf_news_index_status() -> Dict[str, Any]:
             "data_path": ETF_NEWS_INDEX_STATUS.get("data_path"),
             "provider_detail": ETF_NEWS_INDEX_STATUS.get("provider_detail"),
             "error": ETF_NEWS_INDEX_STATUS.get("error"),
+        })
+    return status
+
+
+def get_etf_decision_brief(tickers: str, limit_per_ticker: int = 5) -> Dict[str, Any]:
+    ticker_list = [t.strip().upper() for t in tickers.split(",") if t.strip()]
+    if not ticker_list:
+        raise ValueError("tickers 파라미터가 비어 있습니다. 예: QQQ,SPY,XLE,SMH")
+
+    if not ETF_DECISION_RAG.docs:
+        global ETF_DECISION_INDEX_STATUS
+        ETF_DECISION_INDEX_STATUS = ETF_DECISION_RAG.build_index()
+
+    return ETF_DECISION_RAG.decision_brief(
+        tickers=ticker_list,
+        limit_per_ticker=max(1, min(limit_per_ticker, 10)),
+    )
+
+
+def get_etf_decision_index_status() -> Dict[str, Any]:
+    status = ETF_DECISION_RAG.get_index_status()
+    if ETF_DECISION_INDEX_STATUS:
+        status.update({
+            "built_at": ETF_DECISION_INDEX_STATUS.get("built_at"),
+            "error": ETF_DECISION_INDEX_STATUS.get("error"),
         })
     return status

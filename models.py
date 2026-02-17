@@ -197,3 +197,55 @@ class ETFNewsIndexStatusResponse(BaseModel):
     built_at: Optional[str] = None
     data_path: Optional[str] = None
     error: Optional[str] = None
+
+
+# --- ETF 투자 의사결정 RAG API ---
+class ETFDecisionEvent(BaseModel):
+    doc_id: str
+    event: str
+    market_reaction: str
+    published_at: str
+    source: str
+    source_link: str
+    relevance_score: float = Field(..., ge=0.0, le=1.0)
+
+
+class ETFDecisionEvidence(BaseModel):
+    doc_id: str
+    event: str
+    cause: str
+    development: str
+    market_reaction: str
+    factor_scores: Dict[str, float]
+    source: str
+    source_link: str
+
+
+class ETFDecisionItem(BaseModel):
+    ticker: str
+    signal: Literal["bullish", "neutral", "bearish"]
+    confidence: float = Field(..., ge=0.0, le=1.0)
+    conclusion: str
+    causal_summary: str
+    key_events: List[ETFDecisionEvent]
+    evidence: List[ETFDecisionEvidence]
+    risk_invalidation_conditions: List[str]
+    factor_exposure_used: Dict[str, float]
+
+
+class ETFDecisionBriefResponse(BaseModel):
+    query_tickers: List[str]
+    generated_at: str
+    index_built_at: Optional[str] = None
+    results: List[ETFDecisionItem]
+
+
+class ETFDecisionIndexStatusResponse(BaseModel):
+    indexed_docs: int = Field(..., ge=0)
+    embed_dim: int = Field(..., ge=1)
+    raw_dir: str
+    brief_dir: str
+    archives_by_date: Dict[str, int]
+    latest_loaded: Dict[str, bool]
+    built_at: Optional[str] = None
+    error: Optional[str] = None

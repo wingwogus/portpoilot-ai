@@ -21,6 +21,8 @@ from models import (
     BriefingResponse,
     ETFNewsResponse,
     ETFNewsIndexStatusResponse,
+    ETFDecisionBriefResponse,
+    ETFDecisionIndexStatusResponse,
 )
 from services import (
     publish_daily_report,
@@ -33,6 +35,8 @@ from services import (
     create_briefing,
     search_etf_news,
     get_etf_news_index_status,
+    get_etf_decision_brief,
+    get_etf_decision_index_status,
 )
 
 
@@ -204,3 +208,21 @@ async def get_etf_news_health():
         return get_etf_news_index_status()
     except Exception as e:
         raise HTTPException(status_code=503, detail=f"ETF 뉴스 인덱스 상태 조회 실패: {e}")
+
+
+@app.get("/etf-decision-brief", response_model=ETFDecisionBriefResponse, tags=["etf-decision"])
+async def etf_decision_brief(tickers: str, limit_per_ticker: int = 5):
+    try:
+        return get_etf_decision_brief(tickers=tickers, limit_per_ticker=limit_per_ticker)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"ETF 의사결정 브리프 생성 실패: {e}")
+
+
+@app.get("/etf-decision-brief/index-status", response_model=ETFDecisionIndexStatusResponse, tags=["etf-decision"])
+async def etf_decision_brief_index_status():
+    try:
+        return get_etf_decision_index_status()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"ETF 의사결정 인덱스 상태 조회 실패: {e}")
